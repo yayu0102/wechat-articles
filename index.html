@@ -4,21 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="format-detection" content="telephone=no">
-<title>文章分类 · 无限回旋</title>
+<title>文章分类 · 芯片工坊</title>
 <style>
 :root {
-  --bg: #0a0a14;
-  --card: #14101e;
-  --border: #2a2040;
-  --gold: #C8A050;
-  --gold-dim: #8a6a30;
-  --text: #e0d8c8;
-  --text-dim: #887a6a;
-  --tag-bg: #1a1424;
-  --tag-text: #b0a088;
-  --active-bg: #2a1a20;
-  --active-text: #FFD700;
-  --input-bg: #181020;
+  --bg: #0a0e14;
+  --card: #111720;
+  --border: #1e2a3a;
+  --accent: #00A8CC;
+  --accent-dim: #006680;
+  --accent-glow: rgba(0,168,204,0.12);
+  --text: #d0d8e0;
+  --text-dim: #6e7a8a;
+  --tag-bg: #141e2a;
+  --tag-text: #8a9aaa;
+  --active-bg: #0a1a28;
+  --active-text: #00C8F0;
+  --input-bg: #101720;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -28,51 +29,63 @@ body {
   min-height: 100vh;
   -webkit-tap-highlight-color: transparent;
 }
+
 /* 顶部 */
 .header {
-  position: sticky; top:0; z-index: 10;
+  position: sticky; top:0; z-index:10;
   background: linear-gradient(180deg, var(--bg) 80%, transparent);
-  padding: 20px 16px 12px;
+  backdrop-filter: blur(12px);
+  padding: 24px 16px 12px;
+  border-bottom: 1px solid var(--border);
 }
 .header h1 {
-  font-size: 22px; color: var(--gold); text-align: center;
+  font-size: 24px; color: var(--accent); text-align: center;
+  letter-spacing: 4px; font-weight: 700; margin-bottom: 4px;
+}
+.header h1::before { content: "⚙️ "; font-size: 20px; }
+.header h1::after { content: " ⚙️"; font-size: 20px; }
+.header .subtitle {
+  text-align: center; font-size: 13px; color: var(--text-dim);
   letter-spacing: 2px; margin-bottom: 16px;
 }
-.header h1 span { font-size: 14px; color: var(--gold-dim); display: block; letter-spacing: 0; margin-top: 2px; }
 
 /* 搜索 */
 .search-box {
   display: flex; gap: 8px; margin: 0 0 12px;
 }
 .search-input {
-  flex:1; height:40px; padding:0 14px; border-radius: 20px;
+  flex:1; height:40px; padding:0 14px; border-radius: 8px;
   border:1px solid var(--border); background: var(--input-bg);
   color: var(--text); font-size: 14px; outline: none;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s;
 }
-.search-input:focus { border-color: var(--gold); }
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
 .search-clear {
-  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
-  background: var(--input-bg); color: var(--text-dim); font-size: 18px;
+  width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--input-bg); color: var(--text-dim); font-size: 16px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all .2s;
 }
-.search-clear:hover { border-color: var(--gold); color: var(--gold); }
+.search-clear:hover { border-color: var(--accent); color: var(--accent); }
 
 /* 分类标签 */
 .tags-wrap {
   display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0;
 }
 .tag {
-  padding: 6px 16px; border-radius: 16px; font-size: 13px;
+  padding: 6px 14px; border-radius: 6px; font-size: 12px;
   background: var(--tag-bg); color: var(--tag-text);
   border: 1px solid transparent; cursor: pointer;
   transition: all .15s; white-space: nowrap;
   user-select: none; -webkit-user-select: none;
+  font-family: "SF Mono","Consolas","Microsoft YaHei",monospace;
 }
 .tag:hover { border-color: var(--border); }
-.tag.active { background: var(--active-bg); color: var(--active-text); border-color: var(--gold-dim); }
-.tag-all { font-weight: bold; }
+.tag.active { background: var(--active-bg); color: var(--active-text); border-color: var(--accent-dim); }
+.tag-all { font-weight: 700; font-family: inherit; }
 
 /* 统计 */
 .stats {
@@ -84,13 +97,14 @@ body {
 .list { padding: 0 16px 40px; }
 .card {
   display: block; text-decoration: none; color: inherit;
-  background: var(--card); border-radius: 12px; padding: 16px;
+  background: var(--card); border-radius: 10px; padding: 16px;
   margin-bottom: 10px; border: 1px solid transparent;
   transition: all .2s; position: relative;
+  border-left: 3px solid transparent;
 }
-.card:hover, .card:active { border-color: var(--border); background: #1a1428; }
+.card:hover, .card:active { border-color: var(--border); border-left-color: var(--accent); background: #161e2a; }
 .card-title {
-  font-size: 16px; font-weight: 600; color: var(--text);
+  font-size: 15px; font-weight: 600; color: var(--text);
   margin-bottom: 6px; line-height: 1.4;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
@@ -102,13 +116,14 @@ body {
   overflow: hidden;
 }
 .card-meta {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   font-size: 11px; color: var(--text-dim);
 }
-.card-date { color: var(--gold-dim); }
+.card-date { color: var(--accent-dim); font-family: "SF Mono","Consolas",monospace; }
 .card-tag {
-  padding: 2px 8px; border-radius: 10px;
+  padding: 2px 8px; border-radius: 4px;
   font-size: 10px; background: var(--tag-bg); color: var(--tag-text);
+  font-family: "SF Mono","Consolas","Microsoft YaHei",monospace;
 }
 .card-arrow {
   position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
@@ -126,69 +141,70 @@ body {
 
 /* 页脚 */
 .footer {
-  text-align: center; padding: 20px; font-size: 11px; color: var(--text-dim);
+  text-align: center; padding: 24px; font-size: 11px; color: var(--text-dim);
+  border-top: 1px solid var(--border); margin-top: 20px;
 }
+.footer span { color: var(--accent-dim); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>无限回旋<span>命运之书 · 创作笔记</span></h1>
+  <h1>芯片工坊</h1>
+  <div class="subtitle">Chip Workshop · 半导体技术笔记</div>
   <div class="search-box">
-    <input class="search-input" type="text" id="searchInput" placeholder="搜文章标题或内容...">
+    <input class="search-input" type="text" id="searchInput" placeholder="搜索工艺、设备、材料...">
     <button class="search-clear" id="searchClear" title="清除">✕</button>
   </div>
   <div class="tags-wrap" id="tagsWrap"></div>
   <div class="stats">
-    <span id="statsText">共 10 篇文章</span>
+    <span id="statsText">共 0 篇文章</span>
     <span id="statsFilter" style="display:none"></span>
   </div>
 </div>
 
 <div class="list" id="articleList"></div>
 
-<div class="footer">无限回旋 · 命运之书</div>
+<div class="footer">
+  <span>Chip Workshop</span> · 记录半导体制造的每一个技术细节
+</div>
 
 <script src="articles.js"></script>
 <script>
 (function() {
-  // ===== 初始化 =====
-  const allTags = new Set();
-  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  var allTags = new Set();
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-  ARTICLE_DATA.forEach(a => {
-    (a.tags || '').split(',').forEach(t => {
-      const tag = t.trim();
+  ARTICLE_DATA.forEach(function(a) {
+    (a.tags || '').split(',').forEach(function(t) {
+      var tag = t.trim();
       if (tag) allTags.add(tag);
     });
-    // 确保 date 字段是有效的
     if (!a.date || !DATE_RE.test(a.date)) {
       a.date = '2026-01-01';
     }
   });
 
-  const allTagArr = Array.from(allTags).sort();
-  const tagsWrap = document.getElementById('tagsWrap');
-  const listEl = document.getElementById('articleList');
-  const searchInput = document.getElementById('searchInput');
-  const searchClear = document.getElementById('searchClear');
-  const statsText = document.getElementById('statsText');
-  const statsFilter = document.getElementById('statsFilter');
+  var allTagArr = Array.from(allTags).sort();
+  var tagsWrap = document.getElementById('tagsWrap');
+  var listEl = document.getElementById('articleList');
+  var searchInput = document.getElementById('searchInput');
+  var searchClear = document.getElementById('searchClear');
+  var statsText = document.getElementById('statsText');
+  var statsFilter = document.getElementById('statsFilter');
 
-  let activeTag = null;   // null = all
-  let searchQuery = '';
+  var activeTag = null;
+  var searchQuery = '';
 
-  // ===== 渲染分类标签 =====
   function renderTags() {
-    let html = '<span class="tag tag-all active" data-tag="">全部</span>';
-    allTagArr.forEach(tag => {
-      const cls = activeTag === tag ? ' active' : '';
-      html += `<span class="tag${cls}" data-tag="${escHtml(tag)}">${escHtml(tag)}</span>`;
+    var html = '<span class="tag tag-all active" data-tag="">全部</span>';
+    allTagArr.forEach(function(tag) {
+      var cls = activeTag === tag ? ' active' : '';
+      html += '<span class="tag' + cls + '" data-tag="' + escHtml(tag) + '">' + escHtml(tag) + '</span>';
     });
     tagsWrap.innerHTML = html;
 
-    // 绑定点击
-    tagsWrap.querySelectorAll('.tag').forEach(el => {
+    tagsWrap.querySelectorAll('.tag').forEach(function(el) {
       el.addEventListener('click', function() {
         activeTag = this.dataset.tag || null;
         searchQuery = '';
@@ -199,13 +215,9 @@ body {
     });
   }
 
-  // ===== 搜索 =====
   searchInput.addEventListener('input', function() {
     searchQuery = this.value.trim().toLowerCase();
-    if (searchQuery) {
-      activeTag = null;
-      renderTags();
-    }
+    if (searchQuery) { activeTag = null; renderTags(); }
     renderList();
   });
   searchClear.addEventListener('click', function() {
@@ -214,63 +226,59 @@ body {
     renderList();
   });
 
-  // ===== 过滤逻辑 =====
   function filterArticles() {
-    let list = ARTICLE_DATA;
+    var list = ARTICLE_DATA;
     if (activeTag) {
-      list = list.filter(a => {
-        const tags = (a.tags || '').split(',').map(t => t.trim());
-        return tags.includes(activeTag);
+      list = list.filter(function(a) {
+        var tags = (a.tags || '').split(',').map(function(t) { return t.trim(); });
+        return tags.indexOf(activeTag) !== -1;
       });
     }
     if (searchQuery) {
-      list = list.filter(a => {
-        return a.title.toLowerCase().includes(searchQuery) ||
-               (a.summary || '').toLowerCase().includes(searchQuery) ||
-               (a.tags || '').toLowerCase().includes(searchQuery);
+      list = list.filter(function(a) {
+        return a.title.toLowerCase().indexOf(searchQuery) !== -1 ||
+               (a.summary || '').toLowerCase().indexOf(searchQuery) !== -1 ||
+               (a.tags || '').toLowerCase().indexOf(searchQuery) !== -1;
       });
     }
-    // 按日期倒序
-    list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
     return list;
   }
 
-  // ===== 渲染列表 =====
   function renderList() {
-    const filtered = filterArticles();
-    const total = ARTICLE_DATA.length;
+    var filtered = filterArticles();
+    var total = ARTICLE_DATA.length;
 
     if (filtered.length === 0) {
-      listEl.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">没有找到匹配的文章<br>试试换个关键词或分类</div></div>';
+      listEl.innerHTML = '<div class="empty"><div class="empty-icon">🔬</div><div class="empty-text">没有找到匹配的技术文章<br>试试换关键词或分类</div></div>';
     } else {
-      let html = '';
-      filtered.forEach(a => {
-        const tags = (a.tags || '').split(',').map(t => t.trim()).filter(Boolean);
-        const dateStr = formatDate(a.date);
-        html += `
-          <a class="card" href="${escAttr(a.url)}">
-            <div class="card-title">${escHtml(a.title)}</div>
-            <div class="card-summary">${escHtml(a.summary || '')}</div>
-            <div class="card-meta">
-              <span class="card-date">📅 ${dateStr}</span>
-              ${tags.map(t => `<span class="card-tag">${escHtml(t)}</span>`).join('')}
-            </div>
-            <div class="card-arrow">›</div>
-          </a>`;
+      var html = '';
+      filtered.forEach(function(a) {
+        var tags = (a.tags || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+        var dateStr = formatDate(a.date);
+        html +=
+          '<a class="card" href="' + escAttr(a.url) + '">' +
+            '<div class="card-title">' + escHtml(a.title) + '</div>' +
+            '<div class="card-summary">' + escHtml(a.summary || '') + '</div>' +
+            '<div class="card-meta">' +
+              '<span class="card-date">' + dateStr + '</span>' +
+              tags.map(function(t) { return '<span class="card-tag">' + escHtml(t) + '</span>'; }).join('') +
+            '</div>' +
+            '<div class="card-arrow">›</div>' +
+          '</a>';
       });
       listEl.innerHTML = html;
     }
 
-    statsText.textContent = `共 ${total} 篇`;
+    statsText.textContent = String(total) + ' 篇文章';
     if ((activeTag || searchQuery) && filtered.length !== total) {
       statsFilter.style.display = '';
-      statsFilter.textContent = `筛选到 ${filtered.length} 篇`;
+      statsFilter.textContent = '筛选到 ' + filtered.length + ' 篇';
     } else {
       statsFilter.style.display = 'none';
     }
   }
 
-  // ===== 工具函数 =====
   function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
@@ -279,11 +287,10 @@ body {
   }
   function formatDate(d) {
     if (!d) return '';
-    const parts = d.split('-');
-    return `${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+    var parts = d.split('-');
+    return Number(parts[1]) + '月' + Number(parts[2]) + '日';
   }
 
-  // ===== 启动 =====
   renderTags();
   renderList();
 })();
