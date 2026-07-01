@@ -170,7 +170,7 @@ body {
   <span>Chip Workshop</span> · 记录半导体制造的每一个技术细节
 </div>
 
-<script src="articles.js?v=2"></script>
+<script src="articles.js?v=3"></script>
 <script>
 (function() {
   var allTags = new Set();
@@ -196,6 +196,13 @@ body {
 
   var activeTag = null;
   var searchQuery = '';
+
+  // URL 参数支持: ?tag=光刻 → 自动筛选
+  var urlParams = new URLSearchParams(window.location.search);
+  var urlTag = urlParams.get('tag');
+  if (urlTag && allTagArr.indexOf(urlTag) !== -1) {
+    activeTag = urlTag;
+  }
 
   function renderTags() {
     var html = '<span class="tag tag-all active" data-tag="">全部</span>';
