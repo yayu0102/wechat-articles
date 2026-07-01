@@ -67,16 +67,16 @@ const ARTICLE_DATA = [
   },
   {
     title: "注入工艺实战：能量、剂量、退火、沟道效应与验证四板斧",
-    url: "https://mp.weixin.qq.com/s/dLYxGpv_JRsLK-Sj9tJzuw",
+    url: "https://mp.weixin.qq.com/s/xTDKMNe8wP4gdveb59eOUw",
     date: "2026-06-26",
     tags: "离子注入,热处理,干货",
     summary: "能量选择、剂量校准、RTP退火窗口、沟道效应规避——从工艺工程师的角度拆解注入调试全流程"
   },
   {
     title: "直线电机的'骨架'与'眼睛'：光栅尺和霍尔驱动器如何精准配合？",
-    url: "",
+    url: "https://mp.weixin.qq.com/s/dLYxGpv_JRsLK-Sj9tJzuw",
     date: "2026-06-25",
     tags: "自动化,设备,量测",
-    summary: "光栅尺反馈与Hall换向的协同控制——直线电机定位精度的完整拆解（链接待补充）"
+    summary: "光栅尺反馈与Hall换向的协同控制——直线电机定位精度的完整拆解"
   },
 ];
