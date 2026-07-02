@@ -3,7 +3,7 @@
  */
 const ARTICLE_DATA = [
   {
-    title: "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的"画画"？",
+    title: "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的「画画」？",
     url: "https://mp.weixin.qq.com/s/zIDWeQzqejEjIZM_3uCwjg",
     date: "2026-07-02",
     tags: "光刻,工艺整合,先进工艺",
