@@ -3,6 +3,13 @@
  */
 const ARTICLE_DATA = [
   {
+    title: "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的"画画"？",
+    url: "https://mp.weixin.qq.com/s/zIDWeQzqejEjIZM_3uCwjg",
+    date: "2026-07-02",
+    tags: "光刻,工艺整合,先进工艺",
+    summary: "瑞利判据到化学放大光刻胶，再到2.1nm套刻精度——拆解光刻为什么占制造成本30%以上"
+  },
+  {
     title: "半导体制造到底有多少道工序？一张全景图讲透",
     url: "https://mp.weixin.qq.com/s/SOzYBLM22ioSSk3u09YEMw",
     date: "2026-07-01",
