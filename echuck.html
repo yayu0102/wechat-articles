@@ -3,695 +3,730 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>静电吸盘 E-Chuck · 3D 动画教学</title>
+<title>静电吸盘 E-Chuck 3D教学 · 小芯讲芯片</title>
 <style>
 :root {
-  --cleanroom-blue: #0a1628;
-  --plasma: #00d4ff;
-  --plasma-dim: #006080;
-  --copper: #e8a850;
-  --resist: #ff4470;
-  --silicon: #3a3a50;
-  --text: #c0d0e0;
-  --text-bright: #e8f0f8;
+  --bg:#060e1a; --plasma:#00d4ff; --plasma2:#0088cc; --copper:#e8a850;
+  --resist:#ff4470; --text:#d0d8e8; --bright:#f0f4f8; --dim:#607890;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--cleanroom-blue);
-  overflow: hidden;
-  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
-  height: 100vh; width: 100vw;
-  user-select: none; -webkit-user-select: none;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);overflow:hidden;font-family:"PingFang SC","Microsoft YaHei",sans-serif;height:100vh;width:100vw;user-select:none;-webkit-user-select:none}
 
-#canvas { position:fixed; inset:0; z-index:1; }
+canvas{position:fixed;inset:0;z-index:1}
 
-/* HUD overlay */
-.hud {
-  position: fixed; z-index:10; pointer-events:none;
-}
-.hud-top {
-  top: 20px; left: 24px; right: 24px;
-  display: flex; align-items: center; gap: 16px;
-}
-.hud-title {
-  font-family: "Cascadia Code","Consolas",monospace;
-  font-size: 20px; letter-spacing: 3px;
-  background: linear-gradient(135deg, var(--plasma), #80e8ff, var(--copper));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(0,200,240,0.3));
-}
-.hud-badge {
-  font-size: 10px; letter-spacing: 2px;
-  color: var(--plasma-dim); font-family: "Cascadia Code","Consolas",monospace;
-  border: 1px solid rgba(0,200,240,0.25); border-radius: 4px;
-  padding: 4px 10px;
-}
+/* ── HUD top bar ── */
+.top{position:fixed;z-index:10;top:0;left:0;right:0;padding:16px 20px;
+  background:linear-gradient(180deg,rgba(6,14,26,.95),transparent);
+  display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+.top-title{font-family:"Cascadia Code","Consolas",monospace;font-size:20px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--plasma),#80e8ff,var(--copper));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 8px rgba(0,200,240,.3))}
+.top-badge{font-size:10px;letter-spacing:2px;color:var(--plasma2);
+  border:1px solid rgba(0,200,240,.25);border-radius:4px;padding:4px 10px;
+  font-family:"Cascadia Code","Consolas",monospace}
 
-/* Bottom narration */
-.narration {
-  position: fixed; z-index:10; bottom: 40px; left: 50%;
-  transform: translateX(-50%);
-  max-width: 600px; width: 90%;
-  background: rgba(8,14,28,0.92);
-  border: 1px solid rgba(0,180,240,0.2);
-  border-radius: 12px; padding: 16px 20px;
-  backdrop-filter: blur(12px);
-  pointer-events: auto;
-}
-.narration-step {
-  font-size: 11px; color: var(--plasma-dim);
-  font-family: "Cascadia Code","Consolas",monospace;
-  letter-spacing: 2px; margin-bottom: 4px;
-}
-.narration-title {
-  font-size: 17px; color: var(--text-bright);
-  font-weight: 600; margin-bottom: 6px;
-}
-.narration-desc {
-  font-size: 13px; color: var(--text);
-  line-height: 1.6;
-}
+/* ── Virtual character 小芯 ── */
+.xiaoxin{position:fixed;z-index:15;left:20px;bottom:200px;
+  pointer-events:none;display:flex;align-items:flex-end;gap:0}
+.xiaoxin-avatar{width:80px;height:90px;position:relative;filter:drop-shadow(0 0 12px rgba(0,200,240,.25))}
+.xiaoxin-bubble{max-width:240px;background:rgba(8,16,30,.92);border:1px solid rgba(0,200,240,.25);
+  border-radius:12px;padding:12px 14px;margin-bottom:10px;margin-left:8px;
+  font-size:12px;line-height:1.6;color:var(--text);backdrop-filter:blur(8px);
+  opacity:0;transition:opacity .4s}
+.xiaoxin-bubble.show{opacity:1}
 
-/* Step dots */
-.steps {
-  position: fixed; z-index:10; right: 20px; top: 50%;
-  transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 10px;
-  pointer-events: auto;
-}
-.step-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: rgba(0,180,240,0.2);
-  border: 1px solid rgba(0,180,240,0.3);
-  cursor: pointer; transition: all 0.3s;
-}
-.step-dot.active { background: var(--plasma); box-shadow: 0 0 12px rgba(0,212,255,0.5); }
-.step-dot:hover { border-color: var(--plasma); }
+/* ── Subtitles ── */
+.subs{position:fixed;z-index:20;bottom:100px;left:50%;transform:translateX(-50%);
+  max-width:700px;width:92%;text-align:center;
+  font-size:20px;color:var(--bright);font-weight:600;letter-spacing:1px;
+  background:rgba(6,14,26,.88);border:1px solid rgba(0,200,240,.18);
+  border-radius:10px;padding:14px 20px;backdrop-filter:blur(10px);
+  opacity:0;transition:opacity .5s;pointer-events:none;line-height:1.5}
+.subs.show{opacity:1}
+.subs .highlight{color:var(--plasma)}
 
-/* Controls */
-.controls {
-  position: fixed; z-index:10; bottom: 120px; left: 50%;
-  transform: translateX(-50%);
-  display: flex; gap: 10px; pointer-events: auto;
-}
-.ctrl-btn {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 1px solid rgba(0,200,240,0.35);
-  background: rgba(8,14,28,0.85);
-  color: var(--plasma); font-size: 18px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; backdrop-filter: blur(8px);
-}
-.ctrl-btn:hover { background: rgba(0,200,240,0.15); box-shadow: 0 0 20px rgba(0,200,240,0.2); }
-.ctrl-btn.play-btn { width: 54px; height: 54px; font-size: 22px; }
+/* ── Progress bar ── */
+.progress-wrap{position:fixed;z-index:12;bottom:70px;left:50%;transform:translateX(-50%);
+  width:200px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;pointer-events:none}
+.progress-bar{height:100%;background:var(--plasma);border-radius:2px;transition:width .3s;
+  box-shadow:0 0 8px rgba(0,212,255,.5)}
 
-/* Type toggle */
-.type-toggle {
-  position: fixed; z-index:10; top: 70px; left: 24px;
-  display: flex; gap: 0; pointer-events: auto;
-  border: 1px solid rgba(0,180,240,0.25); border-radius: 6px; overflow: hidden;
-}
-.type-btn {
-  padding: 7px 16px; font-size: 11px; font-family: "Cascadia Code","Consolas",monospace;
-  letter-spacing: 1px; color: var(--text-dim); background: rgba(8,14,28,0.75);
-  border: none; cursor: pointer; transition: all 0.2s;
-}
-.type-btn.active { background: rgba(0,180,240,0.15); color: var(--plasma); }
-.type-btn:hover { color: var(--text-bright); }
+/* ── Controls ── */
+.ctrls{position:fixed;z-index:25;bottom:28px;left:50%;transform:translateX(-50%);
+  display:flex;gap:14px;align-items:center}
+.ctrl{width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(0,200,240,.3);background:rgba(8,18,30,.85);
+  color:var(--plasma);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px)}
+.ctrl:hover{background:rgba(0,200,240,.15);box-shadow:0 0 20px rgba(0,200,240,.2)}
+.ctrl.play{width:50px;height:50px;font-size:20px}
+.ctrl.record{width:auto;border-radius:24px;padding:0 16px;font-size:11px;gap:6px;letter-spacing:1px;
+  font-family:"Cascadia Code","Consolas",monospace;color:var(--resist);border-color:rgba(255,68,112,.4)}
+.ctrl.record:hover{background:rgba(255,68,112,.12);box-shadow:0 0 18px rgba(255,68,112,.2)}
+.ctrl.record.recording{animation:recPulse .8s ease-in-out infinite}
+@keyframes recPulse{0%,100%{border-color:rgba(255,68,112,.4)}50%{border-color:var(--resist);box-shadow:0 0 24px rgba(255,68,112,.4)}}
 
-/* Legend */
-.legend {
-  position: fixed; z-index:10; bottom: 40px; right: 24px; pointer-events:none;
-  font-size: 10px; color: var(--text-dim); font-family: "Cascadia Code","Consolas",monospace;
-  letter-spacing: 1px;
-}
-.legend span { color: var(--plasma-dim); }
-.legend span.copper { color: var(--copper); }
+/* ── Step indicator ── */
+.step-dots{position:fixed;z-index:12;right:16px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:10px}
+.step-dot{width:10px;height:10px;border-radius:50%;background:rgba(0,180,240,.15);
+  border:1px solid rgba(0,180,240,.25);cursor:pointer;transition:all .3s}
+.step-dot.active{background:var(--plasma);box-shadow:0 0 12px rgba(0,212,255,.5)}
+.step-dot.done{background:var(--plasma2);border-color:var(--plasma2)}
 
-@media (max-width: 640px) {
-  .hud-title { font-size: 16px; letter-spacing: 1px; }
-  .narration { bottom: 20px; padding: 12px 14px; }
-  .narration-title { font-size: 15px; }
-  .controls { bottom: 100px; }
-  .steps { right: 8px; }
+/* ── Type toggle ── */
+.type-tgl{position:fixed;z-index:15;top:70px;left:20px;display:flex;gap:0;
+  border:1px solid rgba(0,180,240,.2);border-radius:5px;overflow:hidden}
+.type-tgl button{padding:6px 14px;font-size:10px;font-family:"Cascadia Code","Consolas",monospace;
+  letter-spacing:1px;color:var(--dim);background:rgba(8,18,30,.75);border:none;cursor:pointer;transition:all .2s}
+.type-tgl button.on{background:rgba(0,180,240,.14);color:var(--plasma)}
+.type-tgl button:hover{color:var(--bright)}
+
+/* ── Status ── */
+.status{position:fixed;z-index:12;right:20px;top:20px;font-size:10px;color:var(--dim);
+  font-family:"Cascadia Code","Consolas",monospace;pointer-events:none}
+.status .rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--resist);margin-right:4px;animation:recPulse .8s ease-in-out infinite;display:none}
+.status .rec-dot.on{display:inline-block}
+
+@media(max-width:640px){
+  .top-title{font-size:16px;letter-spacing:1px}
+  .xiaoxin{left:8px;bottom:180px}
+  .xiaoxin-avatar{width:60px;height:68px}
+  .subs{font-size:16px;bottom:90px;padding:10px 14px}
+  .ctrls{bottom:16px;gap:8px}
 }
 </style>
 </head>
 <body>
 
-<canvas id="canvas"></canvas>
+<canvas id="c"></canvas>
 
-<div class="hud hud-top">
-  <span class="hud-title">E-CHUCK</span>
-  <span class="hud-badge" id="typeLabel">J-R 型</span>
+<div class="top">
+  <span class="top-title">E-CHUCK</span>
+  <span class="top-badge" id="typeLabel">J-R 型</span>
 </div>
 
-<div class="type-toggle">
-  <button class="type-btn active" onclick="setType('jr')">J-R 型</button>
-  <button class="type-btn" onclick="setType('coulomb')">Coulomb 型</button>
+<div class="type-tgl">
+  <button class="on" onclick="switchType('jr')">J-R 型</button>
+  <button onclick="switchType('coulomb')">Coulomb 型</button>
 </div>
 
-<div class="steps" id="stepsContainer"></div>
+<div class="step-dots" id="stepDots"></div>
 
-<div class="controls">
-  <button class="ctrl-btn" onclick="prevStep()" title="上一步">◀</button>
-  <button class="ctrl-btn play-btn" id="playBtn" onclick="toggleAuto()" title="自动播放">▶</button>
-  <button class="ctrl-btn" onclick="nextStep()" title="下一步">▶</button>
+<!-- 虚拟角色 小芯 -->
+<div class="xiaoxin" id="xiaoxin">
+  <svg class="xiaoxin-avatar" viewBox="0 0 80 90" id="xxSvg">
+    <!-- body -->
+    <ellipse cx="40" cy="68" rx="24" ry="20" fill="#1a3050" stroke="#00a8d0" stroke-width="1.5"/>
+    <!-- head -->
+    <circle cx="40" cy="30" r="18" fill="#f0e0d0" stroke="#00c8f0" stroke-width="1.2"/>
+    <!-- hair -->
+    <ellipse cx="40" cy="18" rx="20" ry="12" fill="#1a1a40"/>
+    <ellipse cx="30" cy="22" rx="6" ry="10" fill="#1a1a40"/>
+    <ellipse cx="50" cy="22" rx="6" ry="10" fill="#1a1a40"/>
+    <!-- eyes -->
+    <ellipse cx="34" cy="29" rx="3.5" ry="4" fill="#1a1a30"/>
+    <ellipse cx="46" cy="29" rx="3.5" ry="4" fill="#1a1a30"/>
+    <circle cx="35" cy="27.5" r="1.2" fill="white"/>
+    <circle cx="47" cy="27.5" r="1.2" fill="white"/>
+    <!-- blush -->
+    <ellipse cx="29" cy="33" rx="4" ry="2" fill="rgba(255,100,120,.25)"/>
+    <ellipse cx="51" cy="33" rx="4" ry="2" fill="rgba(255,100,120,.25)"/>
+    <!-- mouth (animated) -->
+    <ellipse cx="40" cy="37" rx="4" ry="2.5" fill="#cc5050" id="xxMouth"/>
+    <!-- chip on hair accessory -->
+    <rect x="45" y="12" width="10" height="8" rx="2" fill="#00c8f0" opacity=".8"/>
+    <rect x="47" y="14" width="6" height="4" rx="1" fill="#fff" opacity=".3"/>
+    <!-- name badge -->
+    <rect x="32" y="54" width="16" height="8" rx="2" fill="rgba(0,168,208,.3)"/>
+    <text x="40" y="60" text-anchor="middle" font-size="5" fill="#00d4ff" font-family="sans-serif">小芯</text>
+    <!-- hands -->
+    <circle cx="24" cy="58" r="5" fill="#f0e0d0"/>
+    <circle cx="56" cy="58" r="5" fill="#f0e0d0"/>
+  </svg>
+  <div class="xiaoxin-bubble" id="xxBubble"></div>
 </div>
 
-<div class="narration" id="narration">
-  <div class="narration-step">STEP 1 / 5</div>
-  <div class="narration-title">晶圆接近</div>
-  <div class="narration-desc">机械臂将晶圆送至静电吸盘上方，lift pin 升起接住晶圆后缓缓下降。</div>
+<div class="subs" id="subs"></div>
+
+<div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+<div class="ctrls">
+  <button class="ctrl" onclick="prev()" title="上一步">◀</button>
+  <button class="ctrl play" id="playBtn" onclick="toggleAuto()" title="自动播放">▶</button>
+  <button class="ctrl" onclick="next()" title="下一步">▶</button>
+  <button class="ctrl record" id="recBtn" onclick="toggleRecord()" title="录制视频">
+    <span id="recDot" style="width:8px;height:8px;border-radius:50%;background:var(--resist)"></span>
+    <span id="recLabel">录视频</span>
+  </button>
 </div>
 
-<div class="legend">
-  <span>█</span> 电极  <span class="copper">█</span> 介质层  <span>◇</span> 晶圆
+<div class="status">
+  <span class="rec-dot" id="statusDot"></span>
+  <span id="statusText"></span>
 </div>
 
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
+{"imports":{
+  "three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
 </script>
 
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// ── DOM refs ──
-const canvas = document.getElementById('canvas');
-const narration = document.getElementById('narration');
-const playBtn = document.getElementById('playBtn');
-const typeLabel = document.getElementById('typeLabel');
-const stepsContainer = document.getElementById('stepsContainer');
+// ═══════════════════════════════════════
+// DOM
+// ═══════════════════════════════════════
+const canvas = document.getElementById('c');
+const subsEl = document.getElementById('subs');
+const xxBubble = document.getElementById('xxBubble');
+const xxMouth = document.getElementById('xxMouth');
+const progressBar = document.getElementById('progressBar');
+const recBtn = document.getElementById('recBtn');
+const recLabel = document.getElementById('recLabel');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const stepDotsEl = document.getElementById('stepDots');
 
-// ── Scene setup ──
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+// ═══════════════════════════════════════
+// THREE.JS SCENE
+// ═══════════════════════════════════════
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.05;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#080e18');
-scene.fog = new THREE.Fog('#080e18', 8, 30);
+scene.background=new THREE.Color('#060e1a');
+scene.fog=new THREE.Fog('#060e1a', 6, 28);
 
-const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.5, 40);
-camera.position.set(5, 4.5, 7);
-camera.lookAt(0, 0.6, 0);
+const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, .3, 35);
+camera.position.set(4.5, 3.8, 6.5);
+camera.lookAt(0, .5, 0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0.5, 0);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.minDistance = 4;
-controls.maxDistance = 14;
-controls.maxPolarAngle = Math.PI * 0.65;
+controls.target.set(0, .5, 0);
+controls.enableDamping=true; controls.dampingFactor=.07;
+controls.minDistance=3.5; controls.maxDistance=12;
+controls.maxPolarAngle=Math.PI*.62;
 controls.update();
 
 // ── Lighting ──
-const ambient = new THREE.AmbientLight('#1a3050', 1.8);
-scene.add(ambient);
-
-const key = new THREE.DirectionalLight('#e8f0ff', 4);
-key.position.set(8, 10, 6);
-key.castShadow = true;
-key.shadow.mapSize.set(2048, 2048);
-key.shadow.camera.near = 0.5;
-key.shadow.camera.far = 40;
-key.shadow.camera.left = -8;
-key.shadow.camera.right = 8;
-key.shadow.camera.top = 8;
-key.shadow.camera.bottom = -8;
-key.shadow.bias = -0.0001;
-scene.add(key);
-
-const rim = new THREE.DirectionalLight('#0088cc', 3);
-rim.position.set(-4, 3, -2);
-scene.add(rim);
-
-const fill = new THREE.DirectionalLight('#224466', 1.5);
-fill.position.set(0, -1, 4);
-scene.add(fill);
+scene.add(new THREE.AmbientLight('#1a3050', 2));
+const key = new THREE.DirectionalLight('#f0f8ff', 4.5);
+key.position.set(7,9,5); key.castShadow=true;
+key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.near=.3;key.shadow.camera.far=35;
+key.shadow.camera.left=-6;key.shadow.camera.right=6;
+key.shadow.camera.top=6;key.shadow.camera.bottom=-6;
+key.shadow.bias=-.00005; scene.add(key);
+scene.add(new THREE.DirectionalLight('#0077bb', 2.5).position.set(-3,2,-2));
+scene.add(new THREE.DirectionalLight('#223355', 1.2).position.set(0,-1,3));
 
 // ── Ground ──
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(20, 20),
-  new THREE.MeshStandardMaterial({ color: '#0c1628', roughness: 0.85, metalness: 0.3 })
-);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -2.5;
-ground.receiveShadow = true;
-scene.add(ground);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(16,16),
+  new THREE.MeshStandardMaterial({color:'#0a1424',roughness:.85,metalness:.25}));
+ground.rotation.x=-Math.PI/2; ground.position.y=-2.6; ground.receiveShadow=true; scene.add(ground);
+const grid = new THREE.GridHelper(10,20,'#1a3050','#0c1a2a');
+grid.position.y=-2.58; scene.add(grid);
 
-// Grid
-const grid = new THREE.GridHelper(12, 24, '#1a3550', '#0d1e30');
-grid.position.y = -2.49;
-scene.add(grid);
+// ═══════════════════════════════════════
+// E-CHUCK MODEL — precise structure
+// ═══════════════════════════════════════
+const matBody    = new THREE.MeshStandardMaterial({color:'#252a38',roughness:.3,metalness:.85});
+const matBase    = new THREE.MeshStandardMaterial({color:'#1e2230',roughness:.35,metalness:.9});
+const matElectrode = new THREE.MeshStandardMaterial({color:'#d4883c',roughness:.15,metalness:.95,emissive:'#220800',emissiveIntensity:.2});
+const matDielectricJR = new THREE.MeshStandardMaterial({color:'#5a6a78',roughness:.5,metalness:.08});
+const matDielectricC  = new THREE.MeshPhysicalMaterial({color:'#8899aa',roughness:.12,metalness:.04,clearcoat:.5,clearcoatRoughness:.1,transparent:true,opacity:.65});
+const matWafer  = new THREE.MeshPhysicalMaterial({color:'#3a3058',roughness:.03,metalness:.55,clearcoat:.7,clearcoatRoughness:.03,emissive:'#080018',emissiveIntensity:.15,specularIntensity:.9});
+const matPin    = new THREE.MeshStandardMaterial({color:'#8898a0',roughness:.2,metalness:.92});
+const matGlow   = new THREE.MeshBasicMaterial({color:'#00e0ff',transparent:true,opacity:.55});
+const matDechuck = new THREE.MeshBasicMaterial({color:'#ff4470',transparent:true,opacity:.6});
 
-// ── Materials ──
-const matChuckBody = new THREE.MeshStandardMaterial({ color: '#2a3040', roughness: 0.35, metalness: 0.8 });
-const matElectrode = new THREE.MeshStandardMaterial({ color: '#d4883c', roughness: 0.2, metalness: 0.95, emissive: '#331100', emissiveIntensity: 0.3 });
-const matDielectric = new THREE.MeshPhysicalMaterial({
-  color: '#8899aa', roughness: 0.15, metalness: 0.05,
-  clearcoat: 0.4, clearcoatRoughness: 0.15,
-  transparent: true, opacity: 0.7,
-  envMapIntensity: 0.5
-});
-const matDielectricJR = new THREE.MeshStandardMaterial({ color: '#667788', roughness: 0.55, metalness: 0.1 });
-const matWafer = new THREE.MeshPhysicalMaterial({
-  color: '#3a3060', roughness: 0.05, metalness: 0.6,
-  clearcoat: 0.6, clearcoatRoughness: 0.05,
-  emissive: '#0a0020', emissiveIntensity: 0.2,
-  specularIntensity: 0.8
-});
-const matLiftPin = new THREE.MeshStandardMaterial({ color: '#889898', roughness: 0.25, metalness: 0.9 });
-const matSpark = new THREE.MeshBasicMaterial({ color: '#00e0ff' });
-const matFieldLine = new THREE.MeshBasicMaterial({ color: '#00c8f0', transparent: true, opacity: 0.5 });
+const root = new THREE.Group(); scene.add(root);
 
-// ── Build ESC Chuck ──
-const chuckGroup = new THREE.Group();
-scene.add(chuckGroup);
+// Base (bottom plate)
+const base = new THREE.Mesh(new THREE.CylinderGeometry(1.75,1.8,.12,64), matBase);
+base.position.y = -.36; base.castShadow=true; base.receiveShadow=true; root.add(base);
 
-// Main body
-const chuckBody = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.7, 0.55, 64), matChuckBody);
-chuckBody.position.y = 0;
-chuckBody.castShadow = true; chuckBody.receiveShadow = true;
-chuckGroup.add(chuckBody);
+// Chuck body (main cylinder)
+const body = new THREE.Mesh(new THREE.CylinderGeometry(1.58,1.65,.4,64), matBody);
+body.position.y = -.1; body.castShadow=true; body.receiveShadow=true; root.add(body);
 
-// Base plate
-const basePlate = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.8, 0.12, 64), matChuckBody);
-basePlate.position.y = -0.3;
-basePlate.castShadow = true;
-chuckGroup.add(basePlate);
+// Body top cap (slightly inset)
+const cap = new THREE.Mesh(new THREE.CylinderGeometry(1.54,1.57,.06,64), matBody);
+cap.position.y = .12; cap.castShadow=true; root.add(cap);
 
-// Outer electrode ring (bipolar pattern)
-const electrodeOuter = new THREE.Mesh(
-  new THREE.TorusGeometry(1.15, 0.08, 32, 64),
-  matElectrode
-);
-electrodeOuter.rotation.x = -Math.PI / 2;
-electrodeOuter.position.y = 0.28;
-chuckGroup.add(electrodeOuter);
+// ═══ Electrode layer ═══
+const electrodeY = .18; // sits on top of cap
+const electrodeGroup = new THREE.Group();
+electrodeGroup.position.y = electrodeY;
+root.add(electrodeGroup);
 
-// Inner electrode disc
-const electrodeInner = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.6, 0.6, 0.02, 64),
-  matElectrode
-);
-electrodeInner.position.y = 0.285;
-chuckGroup.add(electrodeInner);
+// Outer bipolar electrode ring segments
+const segGeom = new THREE.TorusGeometry(1.2,.06,16,64, Math.PI*.45);
+for (let i=0;i<4;i++) {
+  const seg = new THREE.Mesh(segGeom, matElectrode);
+  seg.rotation.x=-Math.PI/2; seg.rotation.z=i*Math.PI/2;
+  electrodeGroup.add(seg);
+}
+// Inner electrode
+const eInner = new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.015,48), matElectrode);
+electrodeGroup.add(eInner);
+// Center pad
+const eCenter = new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.015,24), matElectrode);
+electrodeGroup.add(eCenter);
 
-// Electrode connecting pads
-const pad1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.04, 32), matElectrode);
-pad1.position.set(1.05, 0.285, 0);
-chuckGroup.add(pad1);
-const pad2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.04, 32), matElectrode);
-pad2.position.set(-1.05, 0.285, 0);
-chuckGroup.add(pad2);
+// Electrode connector pads
+for (let a=0;a<4;a++){
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.02,16), matElectrode);
+  pad.position.set(Math.cos(a*Math.PI/2)*.9,0,Math.sin(a*Math.PI/2)*.9);
+  electrodeGroup.add(pad);
+}
 
-// Dielectric layer (thin disc on top)
+// ═══ Dielectric layer ═══
+const dielectricY = electrodeY + .02;
 const dielectricGroup = new THREE.Group();
-dielectricGroup.position.y = 0.3;
-chuckGroup.add(dielectricGroup);
-const dielectricDisc = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.35, 0.04, 64), matDielectricJR);
+dielectricGroup.position.y = dielectricY;
+root.add(dielectricGroup);
+const dielectricDisc = new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.35,.035,64), matDielectricJR);
 dielectricGroup.add(dielectricDisc);
 
-// Lift pins (3 pins, retracted in chuck)
-const pinsGroup = new THREE.Group();
-chuckGroup.add(pinsGroup);
-const pinPositions = [
-  [0.7, 0], [-0.35, 0.606], [-0.35, -0.606]
-];
-const pinMeshes = [];
-pinPositions.forEach(([px, pz]) => {
-  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.0, 16), matLiftPin);
-  pin.position.set(px, 0.55, pz);
-  pin.castShadow = true;
-  pinsGroup.add(pin);
-  pinMeshes.push(pin);
-});
-
-// ── Wafer ──
+// ═══ Wafer sits at dielectricY + 0.035 = 0.235 ═══
+const waferY_clamped = dielectricY + .035 + .025; // 0.24
 const waferGroup = new THREE.Group();
-waferGroup.position.y = 1.8;
+waferGroup.position.y = 2.2; // start high (approaching)
 scene.add(waferGroup);
 
-const waferDisc = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.05, 80), matWafer);
-waferDisc.castShadow = true;
-waferGroup.add(waferDisc);
-
-// Wafer notch
-const notchGeom = new THREE.SphereGeometry(0.06, 16, 8);
-const notchCut = new THREE.Mesh(notchGeom, matChuckBody);
-notchCut.position.set(0, 0, 1.28);
-waferGroup.add(notchCut);
-
-// Wafer edge ring
+const waferDisc = new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,.05,80), matWafer);
+waferDisc.castShadow=true; waferGroup.add(waferDisc);
+// Wafer edge highlight
 const waferEdge = new THREE.Mesh(
-  new THREE.TorusGeometry(1.29, 0.02, 16, 80),
-  new THREE.MeshStandardMaterial({ color: '#8888aa', roughness: 0.3, metalness: 0.7 })
+  new THREE.TorusGeometry(1.29,.015,16,80),
+  new THREE.MeshStandardMaterial({color:'#9999bb',roughness:.25,metalness:.65})
 );
-waferEdge.rotation.x = -Math.PI / 2;
-waferEdge.position.y = 0.025;
-waferGroup.add(waferEdge);
-
-// ── Electric field visualization ──
-const fieldGroup = new THREE.Group();
-fieldGroup.visible = false;
-chuckGroup.add(fieldGroup);
-
-// Create field arcs between electrode rings and wafer bottom
-const fieldLines = [];
-const numFieldLines = 36;
-for (let i = 0; i < numFieldLines; i++) {
-  const angle = (i / numFieldLines) * Math.PI * 2;
-  const r = 0.9 + Math.random() * 0.3;
-  const isOuter = i % 3 !== 2;
-
-  const group = new THREE.Group();
-
-  // Vertical beam segments
-  const segCount = 3 + Math.floor(Math.random() * 3);
-  for (let j = 0; j < segCount; j++) {
-    const h = 0.06 + Math.random() * 0.1;
-    const seg = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.012, 0.012, h, 8),
-      new THREE.MeshBasicMaterial({ color: '#00d4ff', transparent: true, opacity: 0.6 })
-    );
-    seg.position.y = 0.32 + j * 0.25;
-    group.add(seg);
-  }
-
-  group.position.set(Math.cos(angle) * r, 0, Math.sin(angle) * r);
-  fieldGroup.add(group);
-  fieldLines.push(group);
-}
-
-// Glow ring around electrodes
-const glowRing = new THREE.Mesh(
-  new THREE.TorusGeometry(1.15, 0.03, 16, 80),
-  new THREE.MeshBasicMaterial({ color: '#00e8ff', transparent: true, opacity: 0.5 })
+waferEdge.rotation.x=-Math.PI/2; waferEdge.position.y=.025; waferGroup.add(waferEdge);
+// Wafer notch marker
+const notch = new THREE.Mesh(
+  new THREE.SphereGeometry(.05,8,8),
+  new THREE.MeshStandardMaterial({color:'#2a2540',roughness:.1,metalness:.5})
 );
-glowRing.rotation.x = -Math.PI / 2;
-glowRing.position.y = 0.33;
-fieldGroup.add(glowRing);
+notch.position.set(0,0,1.28); waferGroup.add(notch);
 
-const glowInner = new THREE.Mesh(
-  new THREE.TorusGeometry(0.6, 0.025, 16, 48),
-  new THREE.MeshBasicMaterial({ color: '#00e8ff', transparent: true, opacity: 0.4 })
-);
-glowInner.rotation.x = -Math.PI / 2;
-glowInner.position.y = 0.33;
-fieldGroup.add(glowInner);
-
-// ── Plasma particles ──
-const particlesGroup = new THREE.Group();
-fieldGroup.add(particlesGroup);
-const particleGeom = new THREE.SphereGeometry(0.025, 8, 8);
-const particles = [];
-for (let i = 0; i < 60; i++) {
-  const p = new THREE.Mesh(particleGeom, matSpark);
-  p.position.set(
-    (Math.random() - 0.5) * 2.5,
-    0.3 + Math.random() * 0.6,
-    (Math.random() - 0.5) * 2.5
-  );
-  p.userData = {
-    baseX: p.position.x,
-    baseZ: p.position.z,
-    speed: 0.5 + Math.random() * 1.5,
-    phase: Math.random() * Math.PI * 2,
-    amplitude: 0.02 + Math.random() * 0.06
-  };
-  particlesGroup.add(p);
-  particles.push(p);
-}
-
-// ── Dechuck voltage lines ──
-const dechuckGroup = new THREE.Group();
-dechuckGroup.visible = false;
-chuckGroup.add(dechuckGroup);
-for (let i = 0; i < 8; i++) {
-  const angle = (i / 8) * Math.PI * 2;
-  const line = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.008, 0.008, 0.4, 6),
-    new THREE.MeshBasicMaterial({ color: '#ff4470', transparent: true, opacity: 0.7 })
-  );
-  line.position.set(Math.cos(angle) * 0.7, 0.5, Math.sin(angle) * 0.7);
-  dechuckGroup.add(line);
-}
-
-// ── Step data ──
-const steps = [
-  {
-    title: '晶圆接近',
-    desc: '机械臂将硅晶圆送至静电吸盘上方，Lift Pin 从 chuck 内部升起接住晶圆，再缓缓下降使晶圆接近吸盘表面。',
-    action: 'approach'
-  },
-  {
-    title: '静电吸附 — 电极通电',
-    desc: '电极施加 DC 电压（±500V~±2kV），在电极与晶圆之间产生强电场。J-R 型吸盘利用体电阻微泄漏电流实现比 Coulomb 型更强的吸附力。',
-    action: 'clamp'
-  },
-  {
-    title: '晶圆夹持 — 工艺加工',
-    desc: '晶圆被牢牢固定在吸盘表面。背面 He 冷却气体通过吸盘内的微通道导入，使晶圆在刻蚀/PVD 过程中保持恒温。吸附力可达数千牛顿。',
-    action: 'hold'
-  },
-  {
-    title: 'Dechuck — 反向电压释放',
-    desc: '工艺完成后，施加反向电压中和残余电荷。J-R 型需更长的 dechuck 时间因体电阻电荷释放较慢。部分设计使用 lift pin + 吹气辅助分离。',
-    action: 'dechuck'
-  },
-  {
-    title: '晶圆取出',
-    desc: 'Lift Pin 再次升起将晶圆托离吸盘表面，机械臂取走晶圆送入下一道工序。一个完整的 clamp/dechuck 循环结束。',
-    action: 'complete'
-  }
-];
-
-let currentStep = 0;
-let isAutoPlaying = false;
-let autoTimer = null;
-let escType = 'jr'; // 'jr' | 'coulomb'
-let animationProgress = 0;
-let animTarget = 0;
-
-// ── Build step dots ──
-steps.forEach((_, i) => {
-  const dot = document.createElement('div');
-  dot.className = 'step-dot' + (i === 0 ? ' active' : '');
-  dot.title = `步骤 ${i + 1}: ${steps[i].title}`;
-  dot.addEventListener('click', () => goToStep(i));
-  stepsContainer.appendChild(dot);
+// ═══ Lift Pins (3x) ═══
+// Pins go through holes in chuck body
+// Retracted: pin top at y = body.top (0.1)  — hidden inside
+// Extended: pin top at y = up to wafer receive height
+const pinsGroup = new THREE.Group(); root.add(pinsGroup);
+const pinPositions = [[.65,0],[-.325,.563],[-.325,-.563]];
+const pinMeshes = [];
+const PIN_LENGTH = 1.5;
+pinPositions.forEach(([px,pz])=>{
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,PIN_LENGTH,12), matPin);
+  pin.position.set(px, .18+PIN_LENGTH/2, pz); // bottom at .18, top at .18+PIN_LENGTH
+  pin.castShadow=true; pinsGroup.add(pin);
+  pinMeshes.push({mesh:pin, baseX:px, baseZ:pz, baseY:.18});
 });
 
-// ── Step navigation ──
-window.goToStep = function(i) {
-  currentStep = Math.max(0, Math.min(steps.length - 1, i));
-  updateStep();
-};
-window.nextStep = function() { goToStep(currentStep + 1); };
-window.prevStep = function() { goToStep(currentStep - 1); };
-window.toggleAuto = function() {
-  isAutoPlaying = !isAutoPlaying;
-  playBtn.textContent = isAutoPlaying ? '⏸' : '▶';
-  if (isAutoPlaying) {
-    if (currentStep >= steps.length - 1) goToStep(0);
-    scheduleNext();
-  } else {
-    clearTimeout(autoTimer);
-  }
-};
+// ═══ Field visualization ═══
+const fieldGroup = new THREE.Group(); fieldGroup.visible=false; root.add(fieldGroup);
 
-function scheduleNext() {
-  clearTimeout(autoTimer);
-  if (!isAutoPlaying) return;
-  autoTimer = setTimeout(() => {
-    if (currentStep < steps.length - 1) { goToStep(currentStep + 1); scheduleNext(); }
-    else { isAutoPlaying = false; playBtn.textContent = '▶'; }
-  }, 4200);
+// Field arcs
+for(let i=0;i<32;i++){
+  const a=(i/32)*Math.PI*2; const r=.7+Math.random()*.5;
+  const g=new THREE.Group();
+  const n=2+Math.floor(Math.random()*4);
+  for(let j=0;j<n;j++){
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,.05+Math.random()*.08,6), new THREE.MeshBasicMaterial({color:'#00d4ff',transparent:true,opacity:.5}));
+    s.position.y=.22+j*.15; g.add(s);
+  }
+  g.position.set(Math.cos(a)*r,0,Math.sin(a)*r);
+  fieldGroup.add(g);
+}
+// Glow rings
+const gR1 = new THREE.Mesh(new THREE.TorusGeometry(1.2,.025,16,80), matGlow);
+gR1.rotation.x=-Math.PI/2;gR1.position.y=.23;fieldGroup.add(gR1);
+const gR2 = new THREE.Mesh(new THREE.TorusGeometry(.55,.02,16,48), new THREE.MeshBasicMaterial({color:'#00e0ff',transparent:true,opacity:.4}));
+gR2.rotation.x=-Math.PI/2;gR2.position.y=.23;fieldGroup.add(gR2);
+
+// Plasma particles
+const partGroup = new THREE.Group(); fieldGroup.add(partGroup);
+const pGeom = new THREE.SphereGeometry(.02,6,6);
+for(let i=0;i<50;i++){
+  const p = new THREE.Mesh(pGeom, new THREE.MeshBasicMaterial({color:'#00e8ff',transparent:true,opacity:.7}));
+  p.position.set((Math.random()-.5)*2.4, .22+Math.random()*.35, (Math.random()-.5)*2.4);
+  p.userData={bx:p.position.x,bz:p.position.z,sp:.5+Math.random()*1.5,ph:Math.random()*Math.PI*2};
+  partGroup.add(p);
 }
 
-function updateStep() {
-  const step = steps[currentStep];
-  narration.innerHTML = `
-    <div class="narration-step">STEP ${currentStep + 1} / ${steps.length}</div>
-    <div class="narration-title">${step.title}</div>
-    <div class="narration-desc">${step.desc}</div>
-  `;
-  animTarget = currentStep;
+// Dechuck indicators
+const dechuckGroup = new THREE.Group(); dechuckGroup.visible=false; root.add(dechuckGroup);
+for(let i=0;i<10;i++){
+  const a=(i/10)*Math.PI*2;
+  const l=new THREE.Mesh(new THREE.CylinderGeometry(.006,.006,.4,6), matDechuck);
+  l.position.set(Math.cos(a)*.6,.35,Math.sin(a)*.6);
+  dechuckGroup.add(l);
+}
 
-  // Update dots
-  Array.from(stepsContainer.children).forEach((dot, i) => {
-    dot.classList.toggle('active', i === currentStep);
+// He cooling channel indicator on body side
+for(let i=0;i<4;i++){
+  const a=i*Math.PI/2;
+  const ch=new THREE.Mesh(new THREE.TorusGeometry(.05,.01,8,16,Math.PI*.4),
+    new THREE.MeshBasicMaterial({color:'#004466',transparent:true,opacity:.4}));
+  ch.position.set(Math.cos(a)*1.45,0,Math.sin(a)*1.45);
+  ch.rotation.x=Math.PI/2;ch.rotation.z=a;
+  root.add(ch);
+}
+
+// ═══════════════════════════════════════
+// SCRIPT DATA — 5 steps with precise timing
+// ═══════════════════════════════════════
+const N = 5;
+let stepIdx = 0;
+const phaseAnim = {value:0, target:0}; // 0..N-1 continuous
+
+const script = [
+  {title:'晶圆接近', sub:'机械臂将硅晶圆送到静电吸盘上方，<span class="highlight">Lift Pin</span> 升起接住晶圆，再缓缓下降到吸盘表面。',
+   bubble:'晶圆来啦！Lift Pin 先升起接住它~'},
+  {title:'静电吸附', sub:'电极施加 DC 高压，在晶圆与介质层之间产生<span class="highlight">强电场</span>。J-R 型吸盘利用微泄漏电流实现比 Coulomb 型更强的吸附力。',
+   bubble:'通电！电场把晶圆牢牢吸住~'},
+  {title:'工艺加工', sub:'晶圆被牢牢固定，背面通入 He 冷却气体控温。<span class="highlight">刻蚀 / 薄膜沉积 / 离子注入</span>在稳定的温度下进行。',
+   bubble:'夹紧啦！现在可以做刻蚀或镀膜了~'},
+  {title:'Dechuck 释放', sub:'施加反向电压中和残余电荷，<span class="highlight">Lift Pin</span> 再次升起辅助分离。J-R 型需更长时间释放体电阻电荷。',
+   bubble:'反向电压消除静电，Pin 针升起帮忙脱开~'},
+  {title:'取片完成', sub:'晶圆被 Lift Pin 托离吸盘，机械臂取走送入下一道工序。一个完整的<span class="highlight"> Clamp/Dechuck 循环</span>结束。',
+   bubble:'搞定！晶圆安全取走，可以处理下一片啦~'}
+];
+
+// Build step dots
+script.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='step-dot'+(i===0?' active':'');
+  d.title='步骤'+(i+1)+': '+script[i].title;
+  d.addEventListener('click',()=>goStep(i));
+  stepDotsEl.appendChild(d);
+});
+function updateDots(){
+  Array.from(stepDotsEl.children).forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i===stepIdx) d.classList.add('active');
+    if(i<stepIdx) d.classList.add('done');
+  });
+  progressBar.style.width=((stepIdx+1)/N*100)+'%';
+}
+
+// ═══════════════════════════════════════
+// AUDIO — Web Speech TTS
+// ═══════════════════════════════════════
+let ttsUtterance = null;
+let ttsSpeaking = false;
+let audioCtx = null;
+let audioDest = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+
+function initAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    audioDest = audioCtx.createMediaStreamDestination();
+  }
+}
+
+function speak(text, onEnd){
+  return new Promise(resolve => {
+    if(!window.speechSynthesis){resolve();return;}
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=.88; u.pitch=1.08;
+    // Try to find a female Chinese voice
+    const voices = speechSynthesis.getVoices();
+    const zh = voices.find(v=>v.lang.startsWith('zh')&&v.name.includes('Female')) ||
+               voices.find(v=>v.lang.startsWith('zh-CN')) ||
+               voices.find(v=>v.lang.startsWith('zh'));
+    if(zh) u.voice=zh;
+    u.onend=()=>{ttsSpeaking=false;resolve();};
+    u.onerror=()=>{ttsSpeaking=false;resolve();};
+    ttsSpeaking=true; ttsUtterance=u;
+    speechSynthesis.speak(u);
   });
 }
 
-// ── Type toggle ──
-window.setType = function(type) {
-  escType = type;
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(type === 'jr' ? 'J-R' : 'Coulomb')));
-  typeLabel.textContent = type === 'jr' ? 'J-R 型' : 'Coulomb 型';
+// Mouth animation interval
+let mouthTimer = null;
+function startMouthAnim(){
+  if(mouthTimer)clearInterval(mouthTimer);
+  mouthTimer = setInterval(()=>{
+    xxMouth.setAttribute('ry', ttsSpeaking?'1.2':'2.5');
+    xxMouth.setAttribute('rx', ttsSpeaking?'5':'4');
+  }, 80);
+}
+startMouthAnim();
 
-  // Update dielectric appearance
-  dielectricDisc.material = type === 'jr' ? matDielectricJR : matDielectric;
-  dielectricDisc.material.needsUpdate = true;
+// ═══════════════════════════════════════
+// STEP EXECUTION
+// ═══════════════════════════════════════
+let isAuto = false;
+let autoTimer = null;
 
-  // Update narration for step 1
-  if (currentStep === 1) {
-    const desc = type === 'jr'
-      ? '电极施加 DC 电压。J-R 型吸盘的介质层具有微导电性（体电阻 ~10⁹–10¹¹ Ω·cm），微小泄漏电流流过晶圆-介质界面，产生比 Coulomb 型更强的 Johnsen-Rahbek 吸附力。'
-      : '电极施加 DC 电压。Coulomb 型吸盘使用高绝缘介质层，电荷通过极化方式累积在介质表面，形成电容式静电力将晶圆吸附。无直流漏电流。';
-    narration.querySelector('.narration-desc').textContent = desc;
+window.goStep = async function(idx){
+  idx=Math.max(0,Math.min(N-1,idx));
+  stepIdx=idx;
+  phaseAnim.target=idx;
+  updateDots();
+
+  // Show subtitle + bubble
+  subsEl.innerHTML=script[idx].sub;
+  subsEl.classList.add('show');
+  xxBubble.textContent=script[idx].bubble;
+  xxBubble.classList.add('show');
+
+  // Speak
+  if(isAuto||idx===stepIdx){
+    await speak(script[idx].title+'。'+script[idx].sub.replace(/<[^>]*>/g,''));
+  }
+
+  if(idx===N-1){
+    // Last step — hide bubble after a moment
+    setTimeout(()=>{xxBubble.classList.remove('show');subsEl.classList.remove('show')},3000);
   }
 };
 
-// ── Animation loop ──
+// Navigation
+window.next=()=>goStep(Math.min(N-1,stepIdx+1));
+window.prev=()=>goStep(Math.max(0,stepIdx-1));
+window.toggleAuto = async function(){
+  isAuto=!isAuto;
+  document.getElementById('playBtn').textContent=isAuto?'⏸':'▶';
+  if(isAuto){
+    if(stepIdx>=N-1)await goStep(0);
+    scheduleAuto();
+  }else{
+    clearTimeout(autoTimer);
+    speechSynthesis.cancel(); ttsSpeaking=false;
+  }
+};
+function scheduleAuto(){
+  clearTimeout(autoTimer);
+  if(!isAuto)return;
+  autoTimer=setTimeout(async()=>{
+    if(stepIdx<N-1){await goStep(stepIdx+1);scheduleAuto();}
+    else{isAuto=false;document.getElementById('playBtn').textContent='▶';}
+  }, 5500);
+}
+
+// Type switch
+window.switchType = function(t){
+  document.querySelectorAll('.type-tgl button').forEach(b=>b.classList.toggle('on',
+    (t==='jr'&&b.textContent.includes('J-R'))||(t==='coulomb'&&b.textContent.includes('Coulomb'))));
+  document.getElementById('typeLabel').textContent = t==='jr'?'J-R 型':'Coulomb 型';
+  dielectricDisc.material = t==='jr'?matDielectricJR:matDielectricC;
+  dielectricDisc.material.needsUpdate=true;
+  if(stepIdx===1){
+    const desc = t==='jr'
+      ? '电极施加 DC 高压，在晶圆与介质层之间产生<span class="highlight">强电场</span>。J-R 型吸盘利用微泄漏电流实现比 Coulomb 型更强的吸附力。'
+      : '电极施加 DC 高压，Coulomb 型吸盘通过介质层极化产生<span class="highlight">电容式静电力</span>吸附晶圆。绝缘介质层无直流漏电流。';
+    subsEl.innerHTML=desc;
+  }
+};
+
+// ═══════════════════════════════════════
+// VIDEO RECORDING
+// ═══════════════════════════════════════
+window.toggleRecord = async function(){
+  if(isRecording){stopRecord();return;}
+
+  initAudio();
+  const stream = canvas.captureStream(30);
+  // Combine canvas video + audio
+  const tracks = stream.getVideoTracks();
+  try{
+    // Try to capture system audio via getDisplayMedia
+    const audioStream = await navigator.mediaDevices.getUserMedia({audio:true}).catch(()=>null);
+    const combined = new MediaStream([...tracks]);
+    if(audioStream) combined.addTrack(audioStream.getAudioTracks()[0]);
+
+    // Also add AudioContext destination for TTS capture
+    if(audioDest){
+      try{combined.addTrack(audioDest.stream.getAudioTracks()[0]);}catch(e){}
+    }
+
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+    mediaRecorder = new MediaRecorder(combined,{mimeType:mime,videoBitsPerSecond:5000000});
+    recordedChunks=[];
+    mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(recordedChunks,{type:'video/webm'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='echuck_教学视频.webm';
+      a.click(); URL.revokeObjectURL(url);
+      statusText.textContent='视频已保存！';
+      recLabel.textContent='录视频';
+      recBtn.classList.remove('recording');
+      statusDot.classList.remove('on');
+      isRecording=false;
+    };
+    mediaRecorder.start();
+    isRecording=true;
+    recLabel.textContent='停止';
+    recBtn.classList.add('recording');
+    statusDot.classList.add('on');
+    statusText.textContent='录制中...';
+  }catch(e){
+    statusText.textContent='录制失败: '+e.message;
+    console.error(e);
+  }
+};
+
+function stopRecord(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive'){mediaRecorder.stop();}
+  speechSynthesis.cancel();
+}
+
+// ═══════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════
 const clock = new THREE.Clock();
-
-function animate() {
+function animate(){
   requestAnimationFrame(animate);
-
-  const dt = Math.min(clock.getDelta(), 0.1);
-  const t = performance.now() * 0.001;
-
+  const dt=Math.min(clock.getDelta(),.1);
+  const t=performance.now()*.001;
   controls.update();
 
-  // Smooth animation progress
-  animationProgress += (animTarget - animationProgress) * Math.min(dt * 3, 1);
+  // Smooth phase animation
+  phaseAnim.value+=(phaseAnim.target-phaseAnim.value)*Math.min(dt*2.5,1);
+  const p=phaseAnim.value;
 
-  // ── Wafer position based on step ──
-  let waferY = 1.8;
-  let waferScale = 1;
-  let fieldOpacity = 0;
-  let pinY = 0.55; // pin top offset
+  // ── Wafer Y position (keyframes) ──
+  // Step 0 (p=0→1): wafer approaches from high → to clamped position
+  // Step 1 (p=1→2): wafer stays clamped
+  // Step 2 (p=2→3): wafer stays clamped
+  // Step 3 (p=3→4): wafer lifts as dechuck
+  // Step 4 (p=4→5): wafer goes away
 
-  if (animationProgress < 0.5) {
-    // Step 0 → 1: wafer approaching
-    const p = animationProgress / 0.5;
-    waferY = 1.8 - p * 1.2; // 1.8 → 0.6
-    pinY = 0.55 + p * 0.3; // pins slightly up if transitioning from approach
-  } else if (animationProgress < 1.5) {
-    // Step 1: wafer clamped
-    waferY = 0.38; // sitting on dielectric (0.3 + 0.04 + 0.025)
-    fieldOpacity = 1;
-    pinY = 0.55; // pins retracted during clamping
-  } else if (animationProgress < 2.5) {
-    // Step 2: hold
-    waferY = 0.38;
-    fieldOpacity = Math.max(0, 1 - (animationProgress - 2.0) * 2);
-    pinY = 0.55;
-  } else if (animationProgress < 3.5) {
-    // Step 3: dechuck
-    const p = (animationProgress - 2.5);
-    waferY = 0.38 + p * 0.6;
-    fieldOpacity = Math.max(0, 1 - p * 2);
-    pinY = 0.55 + p * 0.8;
-  } else {
-    // Step 4: complete — wafer lifted away
-    waferY = 0.98 + (animationProgress - 3.5) * 0.8;
-    fieldOpacity = 0;
-    pinY = 1.0;
+  const approachH = 2.2;
+  const clampedY = waferY_clamped; // ~0.24
+  const liftedY = .75; // dechuck lift height
+
+  let targetWaferY;
+  if(p<1){
+    targetWaferY = approachH + (clampedY-approachH)*p; // smoothly descend
+  }else if(p<3){
+    targetWaferY = clampedY;
+  }else if(p<4){
+    const dp=(p-3); targetWaferY=clampedY+(liftedY-clampedY)*dp;
+  }else{
+    targetWaferY=liftedY+(p-4)*1.2;
+  }
+  waferGroup.position.y+=(targetWaferY-waferGroup.position.y)*dt*5;
+
+  // ── Pin extension ──
+  // Pins up when wafer far away (receive), retracted when clamped
+  // Pin positions: the pin mesh cylinder goes from baseY to baseY+PIN_LENGTH
+  // We want pin TOP to be at:
+  //   When receiving wafer (p≈0): pin top at ~1.8
+  //   When wafer lowering (p 0→1): pin top follows wafer down
+  //   When clamped (p 1→3): pin top at ~0.18 (retracted into body)
+  //   When dechuck (p 3→4): pin top lifts to ~0.7
+  //   After (p>4): pin top at ~1.0
+
+  let targetPinTop;
+  if(p<.3){
+    targetPinTop=1.8;
+  }else if(p<1){
+    const dp=(p-.3)/.7; targetPinTop=1.8+(.18-1.8)*dp; // follow wafer down
+  }else if(p<3){
+    targetPinTop=.18; // fully retracted
+  }else if(p<3.5){
+    const dp=(p-3)/.5; targetPinTop=.18+(.7-.18)*dp;
+  }else if(p<4){
+    targetPinTop=.7;
+  }else{
+    targetPinTop=.7+(p-4)*.6;
   }
 
-  waferGroup.position.y = THREE.MathUtils.lerp(waferGroup.position.y, waferY, dt * 4);
-
-  // ── Update pins ──
-  const targetPinScale = animationProgress > 2.5 ? 1.6 : 1.0;
-  pinMeshes.forEach(p => {
-    p.scale.y += (targetPinScale - p.scale.y) * dt * 3;
-    p.position.y = 0.55 * p.scale.y;
+  pinMeshes.forEach(pm=>{
+    // Pin cylinder center = baseY + PIN_LENGTH/2. We need top = center + PIN_LENGTH/2
+    // So center = targetPinTop - PIN_LENGTH/2
+    const targetCenter = targetPinTop - PIN_LENGTH/2;
+    pm.mesh.position.y+=(targetCenter-pm.mesh.position.y)*dt*4;
   });
 
   // ── Field visibility ──
-  const targetFieldVis = fieldOpacity > 0.3;
-  fieldGroup.visible = fieldOpacity > 0.2;
-
-  // Animate field line opacity
-  const fieldAlpha = Math.max(0, fieldOpacity);
-  fieldLines.forEach((g, i) => {
-    g.children.forEach(c => {
-      c.material.opacity = fieldAlpha * (0.3 + 0.3 * Math.sin(t * 8 + i));
+  const fieldVis = p>=.7&&p<3.2 ? Math.min(1,(p-.7)/.3)*(p<3?1:Math.max(0,(3.2-p)/.2)) : 0;
+  fieldGroup.visible=fieldVis>.05;
+  if(fieldGroup.visible){
+    // Animate field elements
+    fieldGroup.children.forEach((c,j)=>{
+      if(c.isMesh&&c.material.opacity!==undefined&&c!==gR1&&c!==gR2){
+        c.material.opacity=fieldVis*(.3+.3*Math.sin(t*6+j*.3));
+      }
     });
-  });
-  glowRing.material.opacity = fieldAlpha * 0.5;
-  glowInner.material.opacity = fieldAlpha * 0.4;
-
-  // ── Animate plasma particles ──
-  if (fieldOpacity > 0.1) {
-    particlesGroup.visible = true;
-    particles.forEach(p => {
-      const ud = p.userData;
-      p.position.y = 0.32 + Math.sin(t * ud.speed + ud.phase) * ud.amplitude;
-      p.position.x = ud.baseX + Math.cos(t * ud.speed * 0.7 + ud.phase) * 0.05;
-      p.position.z = ud.baseZ + Math.sin(t * ud.speed * 0.6 + ud.phase) * 0.05;
-      p.material.opacity = fieldAlpha * (0.4 + 0.4 * Math.sin(t * ud.speed + ud.phase));
+    gR1.material.opacity=fieldVis*.55;
+    gR2.material.opacity=fieldVis*.4;
+    // Particles
+    partGroup.children.forEach(pt=>{
+      const ud=pt.userData;
+      pt.position.y=.22+Math.sin(t*ud.sp+ud.ph)*.04;
+      pt.position.x=ud.bx+Math.cos(t*ud.sp*.7+ud.ph)*.03;
+      pt.position.z=ud.bz+Math.sin(t*ud.sp*.6+ud.ph)*.03;
+      pt.material.opacity=fieldVis*(.4+.4*Math.sin(t*ud.sp+ud.ph));
     });
-  } else {
-    particlesGroup.visible = false;
+  }
+  // glow always off when field invisible
+  if(!fieldGroup.visible){gR1.material.opacity=0;gR2.material.opacity=0;}
+
+  // ── Dechuck indicators ──
+  const dcPhase = p>=3&&p<4.5 ? Math.min(1,(p-3)/.6)*(p<4?1:Math.max(0,(4.5-p)/.5)) : 0;
+  dechuckGroup.visible=dcPhase>.05;
+  if(dechuckGroup.visible){
+    dechuckGroup.children.forEach((l,i)=>{l.material.opacity=dcPhase*.6*(.5+.5*Math.sin(t*9+i));});
+    dechuckGroup.rotation.y+=dt*.7;
   }
 
-  // ── Dechuck lines ──
-  const dechuckPhase = Math.max(0, (animationProgress - 2.5) / 1.0);
-  dechuckGroup.visible = dechuckPhase > 0.1 && dechuckPhase < 0.9;
-  if (dechuckGroup.visible) {
-    dechuckGroup.children.forEach((line, i) => {
-      line.material.opacity = dechuckPhase * 0.6 * (0.5 + 0.5 * Math.sin(t * 10 + i));
-    });
-    dechuckGroup.rotation.y += dt * 0.8;
-  }
+  // ── Electrode pulse ──
+  matElectrode.emissiveIntensity+=((fieldVis>.3?.5:.2)-matElectrode.emissiveIntensity)*dt*2;
 
-  // ── Wafer subtle rotation ──
-  if (animationProgress < 2.5) {
-    waferGroup.rotation.y += dt * 0.1;
-  }
-
-  // ── Electrode emissive pulse ──
-  const emissiveTarget = fieldOpacity > 0.5 ? 0.6 : 0.3;
-  matElectrode.emissiveIntensity += (emissiveTarget - matElectrode.emissiveIntensity) * dt * 2;
+  // ── Wafer rotation during hold ──
+  if(p>=.9&&p<3.1) waferGroup.rotation.y+=dt*.12;
 
   renderer.render(scene, camera);
 }
 
-// ── Resize ──
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
 });
-
-// ── Keyboard shortcuts ──
-window.addEventListener('keydown', (e) => {
-  switch(e.key) {
-    case 'ArrowRight': case ' ': e.preventDefault(); nextStep(); break;
-    case 'ArrowLeft': e.preventDefault(); prevStep(); break;
-    case 'a': toggleAuto(); break;
-    case '1': goToStep(0); break;
-    case '2': goToStep(1); break;
-    case '3': goToStep(2); break;
-    case '4': goToStep(3); break;
-    case '5': goToStep(4); break;
+window.addEventListener('keydown',e=>{
+  switch(e.key){
+    case'ArrowRight':case' ':e.preventDefault();next();break;
+    case'ArrowLeft':e.preventDefault();prev();break;
+    case'a':toggleAuto();break;
+    case'1':case'2':case'3':case'4':case'5':goStep(parseInt(e.key)-1);break;
   }
 });
 
-// ── Start ──
-updateStep();
+// Preload voices
+speechSynthesis.getVoices();
+speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+
+updateDots();
 animate();
 
-console.log('🔬 E-Chuck 3D 教学动画已就绪');
-console.log('  鼠标拖拽旋转 | 滚轮缩放 | 右键平移');
-console.log('  键盘 ← → 切换步骤 | 空格自动播放');
-console.log('  按 1-5 直达步骤 | 按 A 自动播放');
+console.log('🔬 E-Chuck 3D 教学视频 — 小芯讲芯片');
+console.log('  操作: 鼠标旋转 | 滚轮缩放 | ← → 切换 | 空格/1-5 直达 | A 自动播放');
+console.log('  录视频: 点 "录视频" 按钮 → 自动播放完整教学 → 下载 WebM');
 </script>
 </body>
 </html>
