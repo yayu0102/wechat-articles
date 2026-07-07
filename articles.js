@@ -3,6 +3,13 @@
  */
 const ARTICLE_DATA = [
   {
+    title: "冷泵（Cryopump）工作原理及其再生过程的技术解析",
+    url: "https://mp.weixin.qq.com/s/Wjpfl5yVx2I7J6T46UEB-A",
+    date: "2026-07-07",
+    tags: "真空,设备,干货",
+    summary: "从G-M制冷机低温冷凝到活性炭吸附——拆解冷泵的抽气机理、再生循环时序、以及如何在PVD/注入机等半导体设备中获得<1e-7 Torr的高真空环境"
+  },
+  {
     title: "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的「画画」？",
     url: "https://mp.weixin.qq.com/s/zIDWeQzqejEjIZM_3uCwjg",
     date: "2026-07-02",
