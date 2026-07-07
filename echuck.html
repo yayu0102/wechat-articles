@@ -228,8 +228,8 @@ key.shadow.camera.near=.3;key.shadow.camera.far=35;
 key.shadow.camera.left=-6;key.shadow.camera.right=6;
 key.shadow.camera.top=6;key.shadow.camera.bottom=-6;
 key.shadow.bias=-.00005; scene.add(key);
-scene.add(new THREE.DirectionalLight('#0077bb', 2.5).position.set(-3,2,-2));
-scene.add(new THREE.DirectionalLight('#223355', 1.2).position.set(0,-1,3));
+const rim2 = new THREE.DirectionalLight('#0077bb', 2.5); rim2.position.set(-3,2,-2); scene.add(rim2);
+const fill2 = new THREE.DirectionalLight('#223355', 1.2); fill2.position.set(0,-1,3); scene.add(fill2);
 
 // ── Ground ──
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(16,16),
