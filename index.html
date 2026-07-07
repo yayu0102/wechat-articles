@@ -6,9 +6,7 @@
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>文章分类 · 芯片工坊</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- Fonts: system-native Chinese & monospace — zero external deps -->
 <style>
 :root {
   --silicon: #080c14;
@@ -31,7 +29,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "STHeiti", -apple-system, sans-serif;
   background: var(--silicon);
   color: var(--text);
   min-height: 100vh;
@@ -48,11 +46,23 @@ body {
   pointer-events: none;
 }
 
+/* ── Wafer positioning wrappers — keep translate(-50%,-50%) separate from rotation animation ── */
+.wafer-anchor {
+  position: absolute;
+  width: 0; height: 0;
+  top: 48%; left: 50%;
+}
+.wafer-anchor-2 {
+  position: absolute;
+  width: 0; height: 0;
+  top: 52%; left: 47%;
+}
+
 /* ── Primary wafer disc ── */
 .wafer {
   position: absolute;
   width: 130vmax; height: 130vmax;
-  top: 48%; left: 50%;
+  top: 0; left: 0;
   transform: translate(-50%, -50%) rotate(8deg);
   border-radius: 50%;
   background:
@@ -77,7 +87,7 @@ body {
       rgba(8,16,30,1)     282deg, rgba(32,20,50,0.85)  312deg,
       rgba(8,16,30,1)     360deg
     );
-  animation: waferShimmer 50s linear infinite;
+  animation: waferSpin 50s linear infinite;
   mask-image: radial-gradient(circle, rgba(0,0,0,0.52) 22%, rgba(0,0,0,0.22) 52%, rgba(0,0,0,0.05) 74%, transparent 90%);
   -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,0.52) 22%, rgba(0,0,0,0.22) 52%, rgba(0,0,0,0.05) 74%, transparent 90%);
 }
@@ -86,11 +96,11 @@ body {
 .wafer-2 {
   position: absolute;
   width: 155vmax; height: 155vmax;
-  top: 52%; left: 47%;
+  top: 0; left: 0;
   transform: translate(-50%, -50%) rotate(82deg);
   border-radius: 50%;
   opacity: 0.55;
-  animation: waferShimmer 80s linear infinite reverse;
+  animation: waferSpin 80s linear infinite reverse;
   background:
     radial-gradient(circle at 58% 38%, rgba(0,170,250,0.14) 0%, transparent 42%),
     radial-gradient(circle at 28% 62%, rgba(210,100,60,0.11) 0%, transparent 38%),
@@ -283,9 +293,9 @@ body {
   -webkit-mask-image: radial-gradient(circle 45vmin at 50% 18%, black 30%, transparent 65%);
 }
 
-@keyframes waferShimmer {
-  0%   { transform: translate(-50%, -50%) rotate(8deg); }
-  100% { transform: translate(-50%, -50%) rotate(368deg); }
+@keyframes waferSpin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 @keyframes ringPulse {
@@ -328,7 +338,7 @@ body {
 }
 
 .header h1 {
-  font-family: "Share Tech Mono", "Noto Sans SC", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", "Microsoft YaHei", monospace;
   font-size: 26px; font-weight: 400; letter-spacing: 6px;
   background: linear-gradient(135deg, var(--plasma) 0%, #80e8ff 40%, var(--copper) 100%);
   -webkit-background-clip: text;
@@ -341,7 +351,7 @@ body {
   text-align: center;
   font-size: 12px; color: var(--text-dim);
   letter-spacing: 3px; margin-bottom: 18px;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   text-transform: uppercase;
 }
 .header .subtitle span { color: var(--plasma-dim); }
@@ -356,7 +366,7 @@ body {
   position: absolute;
   left: 12px; top: 50%; transform: translateY(-50%);
   color: var(--plasma-dim);
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   font-size: 14px; z-index: 2; pointer-events: none;
 }
 
@@ -368,12 +378,12 @@ body {
   background: var(--input-bg);
   color: var(--text-bright);
   font-size: 14px;
-  font-family: "Share Tech Mono", "Noto Sans SC", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", "Microsoft YaHei", monospace;
   outline: none;
   transition: all 0.25s;
   letter-spacing: 0.5px;
 }
-.search-input::placeholder { color: rgba(96,112,128,0.5); font-family: "Noto Sans SC", sans-serif; }
+.search-input::placeholder { color: rgba(96,112,128,0.5); font-family: "PingFang SC", "Microsoft YaHei", "STHeiti", sans-serif; }
 .search-input:focus {
   border-color: var(--plasma);
   box-shadow: 0 0 0 3px var(--plasma-glow), inset 0 0 20px rgba(0,212,255,0.04);
@@ -386,7 +396,7 @@ body {
   color: var(--text-dim); font-size: 16px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
 }
 .search-clear:hover { border-color: var(--resist); color: var(--resist); box-shadow: 0 0 14px rgba(255,68,112,0.18); }
 
@@ -403,7 +413,7 @@ body {
   transition: all 0.2s;
   white-space: nowrap;
   user-select: none; -webkit-user-select: none;
-  font-family: "Share Tech Mono", "Noto Sans SC", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", "Microsoft YaHei", monospace;
   position: relative; overflow: hidden;
 }
 .tag::after {
@@ -428,14 +438,14 @@ body {
 }
 .tag.active::after { background: var(--plasma); box-shadow: 0 0 10px var(--plasma); }
 
-.tag-all { font-weight: 700; letter-spacing: 2px; font-family: "Share Tech Mono", monospace; }
+.tag-all { font-weight: 700; letter-spacing: 2px; font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace; }
 
 /* ── Stats ── */
 .stats {
   display: flex; justify-content: space-between;
   padding: 10px 2px 0;
   font-size: 11px; color: var(--text-dim);
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   letter-spacing: 1px;
 }
 .stats #statsFilter { color: var(--plasma-dim); }
@@ -518,7 +528,7 @@ body {
 
 .card-date {
   color: var(--plasma-dim);
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   letter-spacing: 0.5px;
 }
 
@@ -527,7 +537,7 @@ body {
   font-size: 10px;
   background: rgba(15,28,40,0.8);
   color: var(--tag-text);
-  font-family: "Share Tech Mono", "Noto Sans SC", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", "Microsoft YaHei", monospace;
   letter-spacing: 0.5px;
   border: 1px solid rgba(30,50,70,0.3);
   transition: all 0.2s;
@@ -543,11 +553,11 @@ body {
 .empty-icon {
   font-size: 56px; margin-bottom: 16px;
   display: inline-block;
-  animation: waferShimmer 30s linear infinite;
+  animation: waferSpin 30s linear infinite;
 }
 .empty-text {
   font-size: 14px; line-height: 1.8;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   letter-spacing: 1px;
 }
 
@@ -559,7 +569,7 @@ body {
   font-size: 11px; color: var(--text-dim);
   border-top: 1px solid rgba(30,50,70,0.3);
   margin-top: 20px;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "Cascadia Code", "Consolas", "Source Code Pro", monospace;
   letter-spacing: 1px;
   position: relative; z-index: 1;
 }
@@ -607,8 +617,8 @@ body {
      BACKGROUND LAYER
      ═══════════════════════════════════════════ -->
 <div class="bg-layer">
-  <div class="wafer"></div>
-  <div class="wafer-2"></div>
+  <div class="wafer-anchor"><div class="wafer"></div></div>
+  <div class="wafer-anchor-2"><div class="wafer-2"></div></div>
   <div class="wafer-ring"></div>
   <div class="wafer-ring-inner"></div>
   <div class="die-grid"></div>
