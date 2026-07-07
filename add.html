@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>快速添加 · 芯片工坊</title>
+<style>
+:root { --bg:#080c14; --card:#0d1520; --border:#1e2a3a; --plasma:#00d4ff; --text:#c8d8e8; --dim:#607080; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:"PingFang SC","Microsoft YaHei",sans-serif; padding:16px; max-width:640px; margin:0 auto; }
+h1 { color:var(--plasma); font-size:18px; font-family:"Cascadia Code","Consolas",monospace; margin-bottom:18px; text-align:center; letter-spacing:3px; }
+label { display:block; font-size:13px; color:var(--dim); margin:12px 0 4px; }
+input, textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px; background:rgba(8,12,20,0.9); color:var(--text); font-size:14px; font-family:"Cascadia Code","Consolas","Microsoft YaHei",monospace; outline:none; }
+input:focus, textarea:focus { border-color:var(--plasma); }
+textarea { height:80px; resize:vertical; }
+.row { display:flex; gap:10px; } .row>*{flex:1;}
+.btn { width:100%; margin-top:16px; padding:12px; border:1px solid var(--plasma); border-radius:6px; background:rgba(0,212,255,0.08); color:var(--plasma); font-size:15px; font-family:"Cascadia Code","Consolas",monospace; cursor:pointer; letter-spacing:3px; }
+.btn:hover { background:rgba(0,212,255,0.18); }
+#out { margin-top:14px; padding:14px; border-radius:6px; border:1px solid var(--border); background:rgba(8,12,20,0.8); font-size:12px; font-family:"Cascadia Code","Consolas",monospace; white-space:pre-wrap; word-break:break-all; min-height:60px; color:var(--dim); }
+.good { color:#00d4a0; }
+.tip { font-size:11px; color:var(--dim); margin-top:4px; }
+.steps { margin-top:20px; padding:14px; border:1px solid var(--border); border-radius:6px; background:rgba(8,12,20,0.5); }
+.steps h3 { font-size:13px; color:var(--plasma); margin-bottom:8px; }
+.steps li { font-size:12px; color:var(--dim); margin:4px 0 4px 16px; line-height:1.6; }
+.steps code { color:#80c8e0; background:rgba(0,200,240,0.1); padding:1px 5px; border-radius:3px; font-size:11px; }
+.hist { margin-top:18px; border-top:1px solid var(--border); padding-top:14px; }
+.hist h3 { font-size:13px; color:var(--dim); margin-bottom:6px; }
+.hi { font-size:12px; color:var(--dim); padding:5px 0; border-bottom:1px solid rgba(30,50,70,0.2); cursor:pointer; }
+.hi:hover { color:var(--text); }
+.hi span { color:var(--plasma); }
+</style>
+</head>
+<body>
+
+<h1>⚙ 快速添加文章 ⚙</h1>
+
+<label>文章链接 *</label>
+<input type="text" id="url" placeholder="https://mp.weixin.qq.com/s/xxxxxx">
+
+<label>标题 *</label>
+<input type="text" id="title" placeholder="文章标题">
+
+<label>摘要</label>
+<textarea id="summary" placeholder="一句话描述（可选）"></textarea>
+
+<div class="row">
+  <div><label>日期</label><input type="date" id="date"></div>
+  <div><label>标签</label><input type="text" id="tags" placeholder="设备,工艺整合,干货"></div>
+</div>
+
+<div class="tip">日期默认今天 · URL&标题必填 · 其他可选</div>
+<button class="btn" onclick="go()">▶ 生成代码 & 复制</button>
+<div id="out"></div>
+
+<div class="steps">
+  <h3>添加步骤</h3>
+  <ol>
+    <li>填写表单 → 点按钮 → 代码自动复制到剪贴板</li>
+    <li>打开 <code>index.html</code>，搜索 <code>ARTICLE_DATA</code></li>
+    <li>在第一个 <code>{</code> 前面粘贴新文章</li>
+    <li><code>git add index.html && git commit -m "feat: xxx" && git push origin main</code></li>
+  </ol>
+</div>
+
+<div class="hist" id="hist"></div>
+
+<script>
+var K = 'wafer_add_hist';
+function lh() { try{return JSON.parse(localStorage.getItem(K)||'[]');}catch{return[];} }
+function sh(v) { var h=lh().slice(0,19); h.unshift(v); localStorage.setItem(K,JSON.stringify(h)); }
+function ph() { var h=lh(); if(!h.length) return; document.getElementById('hist').innerHTML='<h3>最近添加（点击回填）</h3>'+h.map(function(v,i){return '<div class="hi" onclick="fb('+i+')"><span>'+(v.date||'?')+'</span> '+v.title+'</div>';}).join(''); }
+
+function go() {
+  var url=document.getElementById('url').value.trim();
+  var title=document.getElementById('title').value.trim();
+  var summary=document.getElementById('summary').value.trim();
+  var date=document.getElementById('date').value || new Date().toISOString().slice(0,10);
+  var tags=document.getElementById('tags').value.trim();
+
+  if(!url||!title){ document.getElementById('out').innerHTML='❌ URL 和标题必填'; return; }
+
+  var e={title:title,url:url,date:date,tags:tags||'',summary:summary||title};
+  var code='  {\n    title: '+JSON.stringify(e.title)+',\n    url: '+JSON.stringify(e.url)+',\n    date: '+JSON.stringify(e.date)+',\n    tags: '+JSON.stringify(e.tags)+',\n    summary: '+JSON.stringify(e.summary)+'\n  },';
+
+  navigator.clipboard.writeText(code).then(function(){
+    document.getElementById('out').innerHTML='<span class="good">✅ 已复制！</span><br><br>'+code;
+  },function(){
+    document.getElementById('out').innerHTML=code;
+  });
+  sh(e); ph(); document.getElementById('url').value=''; document.getElementById('title').value=''; document.getElementById('summary').value=''; document.getElementById('tags').value='';
+}
+
+function fb(i) { var v=lh()[i]; document.getElementById('url').value=v.url; document.getElementById('title').value=v.title; document.getElementById('summary').value=v.summary; document.getElementById('date').value=v.date; document.getElementById('tags').value=v.tags; }
+
+document.getElementById('date').value = new Date().toISOString().slice(0,10);
+ph();
+</script>
+</body>
+</html>
