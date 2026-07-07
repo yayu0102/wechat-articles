@@ -197,8 +197,8 @@ const stepDotsEl = document.getElementById('stepDots');
 // THREE.JS SCENE
 // ═══════════════════════════════════════
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -208,7 +208,7 @@ const scene = new THREE.Scene();
 scene.background=new THREE.Color('#060e1a');
 scene.fog=new THREE.Fog('#060e1a', 6, 28);
 
-const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, .3, 35);
+const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, .3, 35);
 camera.position.set(4.5, 3.8, 6.5);
 camera.lookAt(0, .5, 0);
 
@@ -705,8 +705,8 @@ function animate(){
 // INIT
 // ═══════════════════════════════════════
 window.addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
+  camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
 window.addEventListener('keydown',e=>{
   switch(e.key){
