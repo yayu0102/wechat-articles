@@ -446,13 +446,43 @@ function speak(text, onEnd){
     if(!window.speechSynthesis){resolve();return;}
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang='zh-CN'; u.rate=.88; u.pitch=1.08;
-    // Try to find a female Chinese voice
+    u.lang='zh-CN'; u.rate=.82; u.pitch=1.32; u.volume=1;
+
     const voices = speechSynthesis.getVoices();
-    const zh = voices.find(v=>v.lang.startsWith('zh')&&v.name.includes('Female')) ||
-               voices.find(v=>v.lang.startsWith('zh-CN')) ||
-               voices.find(v=>v.lang.startsWith('zh'));
-    if(zh) u.voice=zh;
+    // Sweetest voices in order of preference — across Windows / macOS / Chrome
+    const SWEET = ['Huihui','Yaoyao','Tingting','Meijia','Sinji','Xiaoxiao','Yunyang','Yunxi',
+                   'HsiaoChen','HsiaoYu','Zhiyu','female','Female','Lijuan','Wang','Hong'];
+    let best = null;
+    // Score: match lang prefix + match sweet name
+    const scored = voices.filter(v=>v.lang.startsWith('zh')).map(v=>{
+      let score=0;
+      if(v.lang==='zh-CN') score+=5; else if(v.lang.startsWith('zh-CN')) score+=3; else if(v.lang.startsWith('zh')) score+=1;
+      // Prefer local (non-network) voices — they're faster & more reliable
+      if(v.localService) score+=4;
+      const nl=v.name.toLowerCase();
+      for(let i=0;i<SWEET.length;i++){
+        const s=SWEET[i].toLowerCase();
+        if(nl.includes(s)){score+=12-i;break;}
+      }
+      return {voice:v,score};
+    });
+    scored.sort((a,b)=>b.score-a.score);
+    if(scored.length>0) best=scored[0].voice;
+
+    // Fallback: any zh female
+    if(!best) best=voices.find(v=>v.lang.startsWith('zh')&&v.name.toLowerCase().includes('female'));
+    // Fallback: any zh-CN
+    if(!best) best=voices.find(v=>v.lang.startsWith('zh-CN'));
+    // Fallback: first zh voice
+    if(!best) best=voices.find(v=>v.lang.startsWith('zh'));
+
+    if(best){
+      u.voice=best;
+      console.log('🔊 小芯配音:',best.name,'| lang:',best.lang,'| local:',best.localService);
+    }else{
+      console.warn('⚠ 未找到中文语音，使用系统默认');
+    }
+
     u.onend=()=>{ttsSpeaking=false;resolve();};
     u.onerror=()=>{ttsSpeaking=false;resolve();};
     ttsSpeaking=true; ttsUtterance=u;
