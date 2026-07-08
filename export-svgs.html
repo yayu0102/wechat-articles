@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SVG → PNG 导出</title>
+<style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f5;padding:20px;max-width:800px;margin:0 auto}
+h1{color:#003d7a;font-size:20px}
+.svg-wrap{background:#fff;border:1px solid #ddd;border-radius:8px;padding:16px;margin:20px 0}
+.svg-wrap h3{font-size:14px;color:#555;margin-bottom:8px}
+canvas{border:1px solid #eee;max-width:100%}
+.btn{display:inline-block;padding:8px 18px;background:#0066cc;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;margin:4px}
+.btn:hover{background:#0052a3}
+.info{font-size:12px;color:#888;margin-top:4px}</style></head><body>
+<h1>🔬 RF 加速文章 SVG → PNG 一键导出</h1>
+<p style="color:#666;font-size:13px">右键每张画布 → 另存为图片，或点下载按钮。导出后再插入微信公众号编辑器。</p>
+<div id="container"></div>
+<script>
+// Fetch the article and extract all SVGs
+fetch('rf-acceleration.html')
+  .then(r=>r.text())
+  .then(html=>{
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const svgs = doc.querySelectorAll('svg');
+    const container = document.getElementById('container');
+    let idx = 0;
+    const labels = ['封面图','图1-能量累积阶梯','图2-渡越时间因子T(θ)','图3-相位聚焦原理','图4-传输效率vs n','图5-φₛ Pareto前沿','图6-设计流程图'];
+    svgs.forEach(svg => {
+      const wrap = document.createElement('div'); wrap.className='svg-wrap';
+      const h3 = document.createElement('h3'); h3.textContent = (labels[idx]||'SVG '+(idx+1));
+      wrap.appendChild(h3);
+      const canvas = document.createElement('canvas'); canvas.id='cv'+idx;
+      const w = parseInt(svg.getAttribute('viewBox')?.split(' ')[2]) || 1200;
+      const h = parseInt(svg.getAttribute('viewBox')?.split(' ')[3]) || 675;
+      canvas.width = Math.min(w, 800);
+      canvas.height = Math.min(h, 450);
+      wrap.appendChild(canvas);
+      const btn = document.createElement('button'); btn.className='btn';
+      btn.textContent = '下载 PNG';
+      btn.onclick = function(){ const a=document.createElement('a');a.download='rf_article_'+(labels[idx]||idx)+'.png';a.href=canvas.toDataURL();a.click(); };
+      wrap.appendChild(btn);
+      const info = document.createElement('div'); info.className='info';
+      info.textContent = w+'×'+h+' px  → 缩放至 '+canvas.width+'×'+canvas.height;
+      wrap.appendChild(info);
+      container.appendChild(wrap);
+
+      const img = new Image();
+      const svgData = new XMLSerializer().serializeToString(svg);
+      img.onload = function(){
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#0a1628'; // dark bg for cover
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = 'data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svgData)));
+      idx++;
+    });
+  });
+</script>
+</body></html>
