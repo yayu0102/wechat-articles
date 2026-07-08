@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>射频加速原理深度解析</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #2a2a2a;
+  --text2: #555;
+  --accent: #003d7a;
+  --accent2: #0066cc;
+  --code-bg: #f4f6f9;
+  --border: #e0e4e8;
+  --highlight: #fff3cd;
+  --red: #c0392b;
+  --green: #27ae60;
+  --tag-bg: #e8f0fe;
+  --tag-text: #1a56db;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system,"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+  background: #f0f0f0; color: var(--text); line-height: 1.85;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.article-container {
+  max-width: 680px; margin: 0 auto; background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ── Cover ── */
+.cover {
+  position: relative; width: 100%; padding-top: 56.25%; /* 16:9 */
+  background: #0a1628; overflow: hidden;
+}
+.cover svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cover-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 40px 28px 28px;
+  background: linear-gradient(transparent, rgba(4,10,20,.92));
+}
+.cover-tag {
+  display: inline-block; padding: 4px 12px; border-radius: 3px;
+  font-size: 12px; letter-spacing: 2px; color: #00d4ff;
+  border: 1px solid rgba(0,212,255,.35); margin-bottom: 12px;
+  font-family: "Cascadia Code","Consolas",monospace;
+}
+.cover-title {
+  font-size: 26px; font-weight: 700; color: #f0f4f8; line-height: 1.4;
+  letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+.cover-sub {
+  font-size: 14px; color: #90b8d0; margin-top: 6px; letter-spacing: 1px;
+}
+
+/* ── Content ── */
+.content { padding: 28px 20px 50px; }
+
+.content h2 {
+  font-size: 20px; color: var(--accent); margin: 36px 0 14px;
+  padding-left: 12px; border-left: 4px solid var(--accent2);
+  line-height: 1.3;
+}
+.content h3 {
+  font-size: 17px; color: #1a3a5c; margin: 24px 0 10px;
+}
+.content p { font-size: 15px; color: var(--text); margin: 10px 0; text-align: justify; }
+
+/* ── Formula block ── */
+.formula {
+  background: linear-gradient(135deg, #f8faff, #f0f4fa);
+  border: 1px solid #d0d8e4; border-left: 4px solid var(--accent2);
+  border-radius: 6px; padding: 16px 18px; margin: 16px 0;
+  font-family: "Cascadia Code","Consolas","Courier New",monospace;
+  font-size: 15px; color: #1a2a40; letter-spacing: 0.5px;
+  line-height: 2.2; overflow-x: auto; white-space: nowrap;
+  text-align: center;
+}
+.formula .hl { color: var(--red); font-weight: 700; }
+.formula .hl2 { color: var(--accent2); font-weight: 700; }
+.formula .cmt { color: #8899aa; font-size: 12px; display: block; text-align: left; margin-top: 4px; white-space: normal; }
+
+/* ── Highlight box ── */
+.highlight-box {
+  background: var(--highlight); border: 1px solid #e6d88a; border-radius: 6px;
+  padding: 14px 16px; margin: 14px 0; font-size: 14px; color: #6b5000;
+}
+.highlight-box strong { color: #8b6914; }
+
+/* ── Diagram container ── */
+.diagram {
+  background: #fafbfc; border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; margin: 20px 0; text-align: center;
+  overflow-x: auto;
+}
+.diagram-label {
+  font-size: 13px; color: #8899aa; margin-top: 8px;
+  letter-spacing: 1px; font-weight: 500;
+}
+
+/* ── Table ── */
+table {
+  width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px;
+}
+th {
+  background: #f0f4fa; padding: 10px 12px; text-align: left;
+  font-weight: 600; color: var(--accent); border-bottom: 2px solid var(--accent2);
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+tr:nth-child(even) td { background: #fafbfc; }
+
+/* ── Key point ── */
+.key-point {
+  background: #e8f5f0; border-left: 4px solid var(--green); border-radius: 0 6px 6px 0;
+  padding: 12px 16px; margin: 16px 0; font-size: 14px; color: #1a5030;
+}
+.key-point::before { content: '💡 '; font-size: 16px; }
+
+/* ── List ── */
+.content ul { margin: 10px 0 10px 20px; }
+.content li { font-size: 14px; color: var(--text2); margin: 4px 0; }
+
+/* ── Separator ── */
+.sep { text-align: center; margin: 28px 0; color: #ccc; font-size: 20px; letter-spacing: 8px; }
+
+/* ── Responsive ── */
+@media (max-width: 500px) {
+  .cover-title { font-size: 20px; }
+  .cover-overlay { padding: 24px 16px 16px; }
+  .content { padding: 20px 14px 40px; }
+  .content h2 { font-size: 18px; }
+  .formula { font-size: 12px; padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="article-container">
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<div class="cover">
+  <svg viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#040d1e"/>
+        <stop offset="50%" stop-color="#0a1a38"/>
+        <stop offset="100%" stop-color="#060e24"/>
+      </linearGradient>
+      <radialGradient id="plasmaGlow" cx="45%" cy="55%" r="60%">
+        <stop offset="0%" stop-color="rgba(0,180,240,0.15)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <linearGradient id="beamColor" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(0,200,255,0.1)"/>
+        <stop offset="50%" stop-color="rgba(0,220,255,0.9)"/>
+        <stop offset="100%" stop-color="rgba(0,200,255,0)"/>
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <rect width="1200" height="675" fill="url(#bgGrad)"/>
+    <rect width="1200" height="675" fill="url(#plasmaGlow)"/>
+
+    <!-- Grid background -->
+    <g opacity="0.06">
+      <line x1="0" y1="0" x2="1200" y2="675" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="0" y1="48" x2="1200" y2="723" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="0" y1="96" x2="1200" y2="771" stroke="#00d4ff" stroke-width="0.5"/>
+      <line x1="0" y1="192" x2="1200" y2="867" stroke="#00d4ff" stroke-width="0.3"/>
+      <line x1="0" y1="336" x2="1200" y2="1011" stroke="#00d4ff" stroke-width="0.2"/>
+    </g>
+
+    <!-- RF accelerator tube — n buckets -->
+    <g transform="translate(60,280)">
+      <!-- Outer vacuum chamber -->
+      <rect x="0" y="-80" width="1080" height="160" rx="10" fill="none" stroke="rgba(0,180,240,0.2)" stroke-width="2"/>
+      <rect x="0" y="-80" width="1080" height="160" rx="10" fill="rgba(0,150,220,0.03)"/>
+
+      <!-- n RF electrodes (buckets) -->
+      <g id="electrodes">
+        <!-- Will be repeated — show 8 as representative -->
+        <!-- Electrode pair 1 -->
+        <rect x="40" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.7)" filter="url(#glow)"/>
+        <rect x="54" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.5)"/>
+        <text x="47" y="70" text-anchor="middle" font-size="11" fill="rgba(0,200,240,0.5)" font-family="monospace">V₁</text>
+
+        <rect x="110" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.7)" filter="url(#glow)"/>
+        <rect x="124" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.5)"/>
+        <text x="117" y="70" text-anchor="middle" font-size="11" fill="rgba(250,170,60,0.5)" font-family="monospace">-V₂</text>
+
+        <rect x="180" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.7)" filter="url(#glow)"/>
+        <rect x="194" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.5)"/>
+        <text x="187" y="70" text-anchor="middle" font-size="11" fill="rgba(0,200,240,0.5)" font-family="monospace">V₃</text>
+
+        <rect x="250" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.7)" filter="url(#glow)"/>
+        <rect x="264" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.5)"/>
+
+        <!-- Ellipsis -->
+        <text x="360" y="8" text-anchor="middle" font-size="24" fill="rgba(200,220,240,0.3)" font-family="monospace">···</text>
+
+        <!-- Electrode n -->
+        <rect x="440" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.7)" filter="url(#glow)"/>
+        <rect x="454" y="-50" width="14" height="100" rx="3" fill="rgba(0,200,240,0.5)"/>
+        <text x="447" y="70" text-anchor="middle" font-size="11" fill="rgba(0,200,240,0.5)" font-family="monospace">Vₙ</text>
+
+        <rect x="510" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.7)" filter="url(#glow)"/>
+        <rect x="524" y="-50" width="14" height="100" rx="3" fill="rgba(250,170,60,0.5)"/>
+      </g>
+
+      <!-- Ion beam trace -->
+      <path d="M-10,-5 Q60,-15 130,-3 Q200,-18 270,-4 L380,-8 Q450,-12 530,-4 L620,-6" fill="none" stroke="#00e8ff" stroke-width="2.5" filter="url(#glow)" opacity="0.9"/>
+      <!-- Beam labels -->
+      <text x="10" y="-30" font-size="12" fill="rgba(0,212,255,0.6)" font-family="monospace">Ion Source</text>
+      <text x="15" y="-15" font-size="9" fill="rgba(0,180,240,0.3)" font-family="monospace">E₀, v₀</text>
+
+      <!-- n label -->
+      <text x="580" y="30" font-size="14" fill="rgba(0,212,255,0.7)" font-family="monospace" font-weight="700">× n 个加速间隙</text>
+      <text x="620" y="-20" font-size="12" fill="rgba(0,180,240,0.4)" font-family="monospace">Eₙ, vₙ →</text>
+
+      <!-- Phase labels -->
+      <text x="70" y="120" font-size="10" fill="rgba(255,200,100,0.5)" font-family="monospace">φ₁</text>
+      <text x="140" y="120" font-size="10" fill="rgba(255,200,100,0.5)" font-family="monospace">φ₂</text>
+      <text x="210" y="120" font-size="10" fill="rgba(255,200,100,0.5)" font-family="monospace">φ₃</text>
+      <text x="470" y="120" font-size="10" fill="rgba(255,200,100,0.5)" font-family="monospace">φₙ</text>
+
+      <!-- Gap distance markers -->
+      <line x1="90" y1="-56" x2="104" y2="-56" stroke="#ff6680" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="97" y="-64" text-anchor="middle" font-size="9" fill="rgba(255,100,128,0.6)" font-family="monospace">d₁</text>
+      <line x1="160" y1="-56" x2="174" y2="-56" stroke="#ff6680" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="167" y="-64" text-anchor="middle" font-size="9" fill="rgba(255,100,128,0.6)" font-family="monospace">d₂</text>
+      <line x1="490" y1="-56" x2="504" y2="-56" stroke="#ff6680" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="497" y="-64" text-anchor="middle" font-size="9" fill="rgba(255,100,128,0.6)" font-family="monospace">dₙ</text>
+
+      <!-- RF frequency indicator -->
+      <path d="M0,-85 L30,-95 L60,-85" fill="none" stroke="rgba(200,180,100,0.4)" stroke-width="1"/>
+      <text x="10" y="-82" font-size="10" fill="rgba(200,180,100,0.5)" font-family="monospace">f = ω/2π</text>
+    </g>
+
+    <!-- Formula overlay -->
+    <g transform="translate(60,120)">
+      <text x="0" y="0" font-size="48" fill="rgba(0,212,255,0.04)" font-family="monospace" font-weight="700">
+        Eₜₒₜₐₗ = n · qV₀T·cos(φₛ)
+      </text>
+    </g>
+
+    <!-- Cover text overlay -->
+    <foreignObject x="0" y="390" width="1200" height="285">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="padding: 40px 40px 20px; background: linear-gradient(transparent, rgba(4,10,20,0.95) 30%);">
+        <div style="display:inline-block;padding:5px 14px;border-radius:3px;font-size:13px;letter-spacing:2px;color:#00d4ff;border:1px solid rgba(0,212,255,0.35);margin-bottom:14px;font-family:'Cascadia Code',Consolas,monospace">RF ACCELERATION</div>
+        <div style="font-size:34px;font-weight:700;color:#f0f4f8;line-height:1.4;letter-spacing:1px">射频加速：能量、束流与<br>n 级 RF 桶参数协同设计</div>
+        <div style="font-size:16px;color:#90b8d0;margin-top:8px;letter-spacing:1px">离子注入机核心加速物理全解析</div>
+      </div>
+    </foreignObject>
+  </svg>
+</div>
+
+<!-- ═══════════════ ARTICLE CONTENT ═══════════════ -->
+<div class="content">
+
+<h2>一、从 keV 到 MeV：为什么需要射频加速？</h2>
+
+<p>在半导体离子注入工艺中，注入深度由离子能量直接决定。浅结注入（如源漏延伸区）可能只需要几 keV，而深阱注入或 SOI 埋氧层注入则需要数 MeV。要从几十 keV 的引出能量达到 MeV 量级，直流高压无法同时满足精度和绝缘要求——这就是射频线性加速器（RF Linac）登场的时刻。</p>
+
+<div class="highlight-box">
+  <strong>核心思路：</strong>将总加速电压拆分为 <strong>n</strong> 个独立的射频间隙，每个间隙只承担几百 kV。离子飞越每个间隙时，恰好遇到正向电场，逐级获得能量增量。n 个间隙串联后，总能量为各段之和。
+</div>
+
+<div class="diagram">
+  <svg viewBox="0 0 700 180" width="100%" height="auto" style="max-width:640px">
+    <defs>
+      <linearGradient id="ionGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ff6644"/>
+        <stop offset="50%" stop-color="#ffaa22"/>
+        <stop offset="100%" stop-color="#00cc88"/>
+      </linearGradient>
+    </defs>
+    <!-- Energy vs stage -->
+    <rect x="40" y="20" width="620" height="140" rx="6" fill="#fafbfc" stroke="#e0e4e8" stroke-width="1"/>
+    <text x="350" y="15" text-anchor="middle" font-size="14" fill="#555" font-weight="600" font-family="sans-serif">能量累积示意图（n 个加速间隙）</text>
+
+    <!-- Axes -->
+    <line x1="80" y1="130" x2="630" y2="130" stroke="#333" stroke-width="1.5"/>
+    <line x1="80" y1="130" x2="80" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="355" y="160" text-anchor="middle" font-size="12" fill="#666">加速间隙序号 i</text>
+    <text x="50" y="90" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90,50,90)">离子能量 E</text>
+
+    <!-- Staircase energy gain -->
+    <polyline points="80,130 80,110 150,110 150,90 220,90 220,70 290,70 290,50 360,50 360,35 430,35 430,25 500,25 500,20 570,20 570,12" fill="none" stroke="url(#ionGrad)" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- Stage labels -->
+    <text x="115" y="145" text-anchor="middle" font-size="10" fill="#888">1</text>
+    <text x="185" y="145" text-anchor="middle" font-size="10" fill="#888">2</text>
+    <text x="255" y="145" text-anchor="middle" font-size="10" fill="#888">3</text>
+    <text x="325" y="145" text-anchor="middle" font-size="10" fill="#888">4</text>
+    <text x="465" y="145" text-anchor="middle" font-size="10" fill="#888">...</text>
+    <text x="530" y="145" text-anchor="middle" font-size="10" fill="#888">n</text>
+
+    <!-- Annotations -->
+    <text x="110" y="100" font-size="10" fill="#888" font-family="monospace">ΔE₁</text>
+    <text x="180" y="80" font-size="10" fill="#888" font-family="monospace">ΔE₂</text>
+    <text x="320" y="40" font-size="10" fill="#888" font-family="monospace">ΔEᵢ</text>
+    <text x="500" y="15" font-size="10" fill="#888" font-family="monospace">ΣΔE = ₙ·qV₀Tcosφ</text>
+  </svg>
+  <div class="diagram-label">▲ 图 1 — 离子能量随加速间隙序号的阶梯状累积</div>
+</div>
+
+<h2>二、单间隙加速：一切从"一个间隙"开始</h2>
+
+<h3>2.1 电场结构</h3>
+
+<p>每个 RF 加速间隙由一对电极构成：一侧接 RF 电源正半周，另一侧接地或接负半周。间隙宽度为 <strong>d</strong>，两端的瞬时电压差为：</p>
+
+<div class="formula">
+  V(t) = V₀ · sin(<span class="hl">ω</span>t + <span class="hl2">φ</span>)
+  <span class="cmt">V₀ — RF 峰值电压（kV） · ω = 2πf — 角频率 · φ — 离子到达时的初始相位</span>
+</div>
+
+<h3>2.2 渡越时间因子 T（Transit Time Factor）</h3>
+
+<p>离子穿过间隙需要时间，而非瞬间完成。设离子速度为 v，穿越间隙 d 的渡越时间为 τ = d/v。在 τ 时间内，电场是变化的——离子感受到的不是峰值电压 V₀，而是 τ 时段内的平均电场积分。这个衰减由一个无量纲参数 <strong>T</strong> 描述：</p>
+
+<div class="formula">
+       ┌              ┐<br>
+       │  sin(<span class="hl2">θ</span>/2)  │<br>
+  T =  │ ──────────  │<br>
+       │    <span class="hl2">θ</span>/2      │<br>
+       └              ┘<br>
+  <span class="cmt">其中 θ = ωτ = ωd/v — 渡越角（transit angle），代表离子穿越间隙期间 RF 场经历了多少相位变化</span>
+</div>
+
+<p><strong>物理直觉：</strong>当 θ → 0（极窄间隙或极慢 RF），T → 1，离子"感觉"到全部峰值电压。当 θ = π（渡越时间 = 半个 RF 周期），T = 2/π ≈ 0.64，有效电压损失 36%。</p>
+
+<div class="diagram">
+  <svg viewBox="0 0 640 260" width="100%" height="auto" style="max-width:600px">
+    <rect x="20" y="10" width="600" height="240" rx="6" fill="#fafbfc" stroke="#e0e4e8"/>
+    <text x="320" y="36" text-anchor="middle" font-size="14" fill="#555" font-weight="600">渡越时间因子 T vs. 渡越角 θ</text>
+
+    <!-- Axes -->
+    <line x1="70" y1="220" x2="580" y2="220" stroke="#333" stroke-width="1.5"/>
+    <line x1="70" y1="220" x2="70" y2="50" stroke="#333" stroke-width="1.5"/>
+    <text x="325" y="250" text-anchor="middle" font-size="11" fill="#666">渡越角 θ = ωd/v</text>
+    <text x="40" y="140" font-size="11" fill="#666">T(θ)</text>
+
+    <!-- Curve T(θ) = sin(θ/2)/(θ/2) -->
+    <path d="M70,55 Q110,58 150,70 Q190,85 230,100 Q270,120 310,140 Q350,160 390,175 Q430,190 480,200 Q540,212 570,218" fill="none" stroke="#0066cc" stroke-width="2.5"/>
+
+    <!-- Important points -->
+    <circle cx="70" cy="55" r="4" fill="#0066cc"/>
+    <text x="80" y="50" font-size="10" fill="#0066cc" font-family="monospace">T(0)=1</text>
+
+    <circle cx="230" cy="100" r="3" fill="#27ae60"/>
+    <text x="200" y="90" font-size="10" fill="#27ae60" font-family="monospace">θ=π/2 T≈0.90</text>
+
+    <circle cx="390" cy="175" r="3" fill="#c0392b"/>
+    <text x="380" y="168" font-size="10" fill="#c0392b" font-family="monospace">θ=π T≈0.64</text>
+
+    <line x1="230" y1="100" x2="230" y2="220" stroke="#27ae60" stroke-width="0.5" stroke-dasharray="4,3"/>
+    <line x1="390" y1="175" x2="390" y2="220" stroke="#c0392b" stroke-width="0.5" stroke-dasharray="4,3"/>
+  </svg>
+  <div class="diagram-label">▲ 图 2 — T(θ) 随渡越角增大而衰减</div>
+</div>
+
+<h3>2.3 单间隙能量增益</h3>
+
+<p>一个离子飞越单个 RF 间隙获得的净能量为：</p>
+
+<div class="formula">
+  <span class="hl">ΔE</span> = q · V₀ · T(θ) · cos(<span class="hl2">φₛ</span>)
+  <span class="cmt">q — 离子电荷量（C） · V₀ — RF 峰值电压（V） · T — 渡越时间因子 · φₛ — 同步相位</span>
+</div>
+
+<div class="key-point">
+  这是射频加速中最核心的公式。四个参数 (V₀, d → T, φₛ, f → ω → θ) 相互耦合，工程设计就是在这四个维度之间寻找能量增益最大化的折衷方案。
+</div>
+
+<h2>三、n 级串联：从单间隙到多段加速器</h2>
+
+<h3>3.1 总能量公式</h3>
+
+<p>将 <strong>n</strong> 个相同的加速间隙串联，每个间隙贡献 ΔEᵢ。如果所有间隙的设计参数相同（同步加速条件），总能量为：</p>
+
+<div class="formula">
+  <span class="hl">E<sub>total</sub></span> = E<sub>injection</sub> + <span class="hl">n</span> · q · V₀ · T · cos(φₛ)
+  <span class="cmt">E<sub>injection</sub> — 离子源引出能量 · n — RF 加速桶（间隙）数量 · 每个间隙贡献相同的 ΔE</span>
+</div>
+
+<p>例如：注入 BF₂⁺（q = +e = 1.6×10⁻¹⁹ C），V₀ = 200 kV，T = 0.85，φₛ = -25°（cos φₛ ≈ 0.906），n = 12，则：</p>
+
+<div class="formula">
+  E<sub>acc</sub> = 12 × (1.6×10<sup>-19</sup> C) × (2×10<sup>5</sup> V) × 0.85 × 0.906<br>
+  = 12 × 24.6 keV ≈ <span class="hl">295 keV</span>
+  <span class="cmt">12 个 RF 桶共贡献 295 keV 加速能量，加上注入能量即为总能量</span>
+</div>
+
+<h3>3.2 同步相位条件：纵向聚焦</h3>
+
+<p>为什么选取 <strong>负相位</strong>（φₛ &lt; 0）？这涉及 RF 加速器中最重要的稳定性机制——<strong>相位自动聚焦（Phase Focusing）</strong>：</p>
+
+<div class="diagram">
+  <svg viewBox="0 0 680 260" width="100%" height="auto" style="max-width:620px">
+    <rect x="10" y="5" width="660" height="248" rx="6" fill="#fafbfc" stroke="#e0e4e8"/>
+    <text x="340" y="28" text-anchor="middle" font-size="14" fill="#555" font-weight="600">相位聚焦原理</text>
+
+    <!-- Sine wave -->
+    <path d="M60,150 Q120,50 180,150 Q240,250 300,150 Q360,50 420,150 Q480,250 540,150 Q600,50 660,150" fill="none" stroke="#0066cc" stroke-width="2"/>
+    <text x="580" y="130" font-size="11" fill="#0066cc" font-family="monospace">V(t) = V₀sin(ωt)</text>
+
+    <!-- Synchronous particle marker -->
+    <line x1="240" y1="60" x2="240" y2="220" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,3"/>
+    <circle cx="240" cy="150" r="6" fill="#c0392b"/>
+    <text x="245" y="70" font-size="11" fill="#c0392b" font-family="monospace">同步粒子 φₛ = -30°</text>
+
+    <!-- Early particle -->
+    <circle cx="210" cy="130" r="5" fill="#e8a850"/>
+    <text x="170" y="115" font-size="10" fill="#e8a850" font-family="monospace">超前粒子：斜率较小 → 获得更少能量 → 速度增速慢 → 相位后移 ✓ 稳定</text>
+
+    <!-- Late particle -->
+    <circle cx="270" cy="168" r="5" fill="#00a080"/>
+    <text x="280" y="200" font-size="10" fill="#00a080" font-family="monospace">滞后粒子：斜率较大 → 获得更多能量 → 速度增速快 → 相位前移 ✓ 稳定</text>
+
+    <!-- Annotations -->
+    <text x="120" y="45" font-size="11" fill="#666" font-family="monospace">正向半周（加速）</text>
+    <text x="360" y="245" font-size="11" fill="#999" font-family="monospace">负向半周（减速—不在此区注入）</text>
+
+    <text x="340" y="155" font-size="12" fill="#555">φₛ 必须选在 -π/2 &lt; φₛ &lt; 0</text>
+  </svg>
+  <div class="diagram-label">▲ 图 3 — 同步相位 φₛ &lt; 0 提供的纵向相位聚焦</div>
+</div>
+
+<p>通俗理解：超前到达的离子处于 RF 电压上升沿，斜率更小 → 获得更少的能量增量 → 速度增长慢 → 下个间隙相位后移 → 追回同步位置。反之亦然。</p>
+
+<div class="formula">
+  纵向聚焦条件：<span class="hl">-π/2 &lt; φₛ &lt; 0</span>
+  <span class="cmt">正相位区域（0 &lt; φₛ &lt; π/2）为纵向散焦——电流会迅速散开，不能用于稳定加速</span>
+</div>
+
+<h3>3.3 n 对能量离散的影响</h3>
+
+<p>n 个间隙串联后，每个间隙的电压 V₀ 可能存在 ±ΔV 的波动，导致最终能量存在统计分布。若各间隙电压独立且标准差均为 σ_V，则总能量标准差为：</p>
+
+<div class="formula">
+  σ<sub>E</sub> = √<span class="hl">n</span> · q · T · cos(φₛ) · σ<sub>V</sub>
+  <span class="cmt">总能量离散度与 √n 成正比——间隙越多，能量一致性要求越高</span>
+</div>
+
+<h2>四、束流强度（Beam Current）</h2>
+
+<h3>4.1 基本定义</h3>
+
+<p>束流强度 I 是单位时间内通过横截面的离子电荷总量：</p>
+
+<div class="formula">
+  <span class="hl">I</span> = q · N<sub>bunch</sub> · <span class="hl2">f<sub>bunch</sub></span>
+  <span class="cmt">N<sub>bunch</sub> — 每个 RF bunch 中的离子数 · f<sub>bunch</sub> — bunch 重复频率（通常 = RF 频率 f）</span>
+</div>
+
+<h3>4.2 空间电荷极限（Child-Langmuir 定律）</h3>
+
+<p>束流不能无限增大——当离子自身的空间电荷电场超过外加加速电场时，束流饱和。对于平面二极管结构，极限电流密度为：</p>
+
+<div class="formula">
+  J<sub>CL</sub> = (4ε₀/9) · √(<span class="hl">2q/m</span>) · <span class="hl2">V</span><sup>3/2</sup> / <span class="hl">d²</span>
+  <span class="cmt">ε₀ = 8.85×10⁻¹² F/m（真空介电常数） · m — 离子质量 · V — 引出电压 · d — 引出间隙距离</span>
+</div>
+
+<p>由此式可以直接看出：</p>
+
+<table>
+  <tr><th>参数</th><th>对 J_CL 的影响</th><th>工程含义</th></tr>
+  <tr><td>电压 V ↑</td><td>J ∝ V^(3/2) ↑↑</td><td>提高引出电压可显著提升束流</td></tr>
+  <tr><td>间隙 d ↑</td><td>J ∝ 1/d² ↓↓</td><td>缩小间隙 → 更大的空间电荷极限，但击穿风险增加</td></tr>
+  <tr><td>离子质量 m ↑</td><td>J ∝ √(1/m) ↓</td><td>重离子（如 BF₂⁺）极限束流小于轻离子（如 B⁺）</td></tr>
+</table>
+
+<h3>4.3 RF 桶对束流的调制</h3>
+
+<p>每个 RF 间隙不仅是加速元件，同时也是 <strong>buncher（聚束器）</strong>。n 个间隙的聚束效率 η 定义为通过所有间隙后仍保持在束团中的离子比例：</p>
+
+<div class="formula">
+  η<sub>n</sub> = η₀<sup><span class="hl">n</span></sup>
+  <span class="cmt">η₀ — 单间隙传输效率（典型值 0.95~0.99，取决于相位聚焦强度）</span>
+</div>
+
+<p>最终到达靶面的有效束流：</p>
+
+<div class="formula">
+  <span class="hl">I<sub>effective</sub></span> = I<sub>source</sub> × η<sub>n</sub> = I<sub>source</sub> × η₀<sup>n</sup>
+</div>
+
+<div class="key-point">
+  n 越大，传输效率呈指数衰减。设计时需要权衡：增加 n → 更高能量 vs. η₀^n 衰减 → 更少束流。典型注入机在 n=10~20 区间，η_total = 60%~85%。
+</div>
+
+<div class="diagram">
+  <svg viewBox="0 0 640 240" width="100%" height="auto" style="max-width:600px">
+    <rect x="10" y="5" width="620" height="228" rx="6" fill="#fafbfc" stroke="#e0e4e8"/>
+    <text x="320" y="30" text-anchor="middle" font-size="14" fill="#555" font-weight="600">传输效率 vs RF 桶数量 n</text>
+
+    <line x1="70" y1="200" x2="590" y2="200" stroke="#333" stroke-width="1.5"/>
+    <line x1="70" y1="200" x2="70" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="330" y="225" text-anchor="middle" font-size="11" fill="#666">RF 桶数量 n</text>
+    <text x="45" y="125" font-size="11" fill="#666">η_total</text>
+
+    <!-- Curves for different η₀ -->
+    <!-- η₀=0.99 -->
+    <path d="M70,45 Q150,55 230,70 Q310,90 390,115 Q470,145 550,175 Q590,190 620,195" fill="none" stroke="#27ae60" stroke-width="2.5"/>
+    <text x="460" y="100" font-size="10" fill="#27ae60" font-family="monospace">η₀=0.99</text>
+
+    <!-- η₀=0.97 -->
+    <path d="M70,48 Q150,65 230,85 Q310,110 390,140 Q470,170 550,190" fill="none" stroke="#e8a850" stroke-width="2.5"/>
+    <text x="460" y="130" font-size="10" fill="#e8a850" font-family="monospace">η₀=0.97</text>
+
+    <!-- η₀=0.95 -->
+    <path d="M70,50 Q150,75 230,105 Q310,145 390,175 Q470,195 520,200" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="175" y="85" font-size="10" fill="#c0392b" font-family="monospace">η₀=0.95</text>
+
+    <!-- n=10 marker -->
+    <line x1="300" y1="40" x2="300" y2="200" stroke="#888" stroke-width="0.5" stroke-dasharray="4,3"/>
+    <text x="300" y="215" text-anchor="middle" font-size="9" fill="#888">n=10</text>
+  </svg>
+  <div class="diagram-label">▲ 图 4 — η_total = η₀^n 随 n 指数衰减</div>
+</div>
+
+<h2>五、四个"旋钮"的协同设计</h2>
+
+<p>RF 加速器设计师手上有四个可调参数——V₀（电压）、φₛ（相位）、d（间隙距离）、f（频率）。它们不是独立变量，而是一个相互耦合的系统。</p>
+
+<h3>5.1 射频桶电压 V₀ — "油门"</h3>
+
+<table>
+  <tr><th>V₀ 调高 ↑</th><th>V₀ 调低 ↓</th></tr>
+  <tr><td>✓ 每个间隙贡献更多 ΔE</td><td>✓ 降低电极间击穿风险</td></tr>
+  <tr><td>✓ 可以用更少的 n 达到目标能量</td><td>✓ RF 电源成本更低、体积更小</td></tr>
+  <tr><td>✗ 电极间击穿风险（Paschen 定律）</td><td>✗ 需要更多 n → 加速器变长</td></tr>
+  <tr><td>✗ RF 电源功率 ∝ V₀²</td><td>✗ η₀^n 衰减加剧</td></tr>
+</table>
+
+<div class="highlight-box">
+  <strong>工程经验：</strong>真空度 10⁻⁷~10⁻⁸ Torr 时，电极间隙击穿电压约 5~10 MV/m。对于 d = 20 mm 的间隙，峰值电压 V₀ 通常限制在 150~250 kV。
+</div>
+
+<h3>5.2 同步相位 φₛ — "方向盘"</h3>
+
+<p>φₛ 的选择是一个三难权衡：</p>
+
+<div class="formula">
+  cos(φₛ) 更大 → 能量增益 <span class="hl">↑</span> 但纵向聚焦力 <span class="hl2">↓</span><br>
+  φₛ → -90° → 零能量增益（纯横向偏转，无加速）<br>
+  φₛ → 0°  → 最大能量增益但在纵向散焦边缘<br>
+  工程最优：<span class="hl">φₛ ≈ -20° ~ -35°</span>（cos φₛ ≈ 0.82 ~ 0.94）
+</div>
+
+<div class="diagram">
+  <svg viewBox="0 0 600 220" width="100%" height="auto" style="max-width:560px">
+    <rect x="5" y="5" width="590" height="210" rx="6" fill="#fafbfc" stroke="#e0e4e8"/>
+    <text x="300" y="28" text-anchor="middle" font-size="14" fill="#555" font-weight="600">φₛ 选择的 Pareto 前沿</text>
+
+    <!-- Polar-ish plot -->
+    <line x1="50" y1="180" x2="550" y2="180" stroke="#333" stroke-width="1.5"/>
+    <line x1="50" y1="180" x2="50" y2="25" stroke="#333" stroke-width="1.5"/>
+
+    <!-- cos φ curve -->
+    <path d="M50,30 Q200,40 350,90 Q500,160 550,178" fill="none" stroke="#0066cc" stroke-width="2.5"/>
+    <text x="400" y="60" font-size="11" fill="#0066cc" font-family="monospace">能量增益 ∝ cosφ</text>
+
+    <!-- Focusing strength curve -->
+    <path d="M50,178 Q200,130 350,60 Q450,30 550,22" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+    <text x="120" y="60" font-size="11" fill="#c0392b" font-family="monospace">聚焦力 ∝ |-sinφ|</text>
+
+    <!-- Sweet spot -->
+    <rect x="280" y="50" width="120" height="90" rx="4" fill="rgba(39,174,96,0.1)" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="340" y="105" text-anchor="middle" font-size="11" fill="#27ae60" font-weight="600">最优区间</text>
+    <text x="340" y="122" text-anchor="middle" font-size="10" fill="#27ae60" font-family="monospace">φₛ = -20°~-35°</text>
+
+    <text x="300" y="200" text-anchor="middle" font-size="10" fill="#666">|φₛ| → 增大 ←</text>
+    <text x="40" y="195" font-size="10" fill="#666" font-family="monospace">-90°</text>
+    <text x="535" y="195" font-size="10" fill="#666" font-family="monospace">0°</text>
+  </svg>
+  <div class="diagram-label">▲ 图 5 — φₛ 在能量增益和聚焦力之间的权衡</div>
+</div>
+
+<h3>5.3 电极间隙距离 d — "精密螺丝"</h3>
+
+<p>d 同时出现在三个物理过程中：</p>
+
+<div class="formula">
+  (1) 渡越时间因子：T = sin(<span class="hl">θ</span>/2)/(<span class="hl">θ</span>/2)，其中 θ = ω<span class="hl">d</span>/v<br>
+  (2) 电场强度：E = V₀/<span class="hl">d</span>（击穿约束）<br>
+  (3) 空间电荷极限：J_CL ∝ 1/<span class="hl">d</span>²
+</div>
+
+<p><strong>优化逻辑链：</strong></p>
+<ul>
+  <li>d ↓ → θ ↓ → T ↑ → ΔE ↑ ✓</li>
+  <li>d ↓ → E = V₀/d ↑ → 击穿风险 ↑ ✗</li>
+  <li>d ↓ → J_CL ↑ → 可传输更大束流 ✓</li>
+</ul>
+
+<div class="key-point">
+  <strong>d 的下限由真空击穿决定：</strong>Paschen 曲线表明，在 10⁻⁷ Torr 真空中，不锈钢电极的击穿场强约 5~10 MV/m。对于 V₀=200 kV，d_min ≈ 20~40 mm。实际工程中 d 通常设计在 25~50 mm 范围。
+</div>
+
+<h3>5.4 RF 频率 f — "节拍器"</h3>
+
+<p>频率通过渡越角 θ = ωd/v = 2πfd/v 耦合到所有参数：</p>
+
+<table>
+  <tr><th>f ↑ 高频</th><th>f ↓ 低频</th></tr>
+  <tr><td>✓ 结构紧凑（波长 λ = v/f 更短）</td><td>✓ 渡越角 θ 更小 → T 更大</td></tr>
+  <tr><td>✓ RF 电源体积小</td><td>✓ RF 电源设计与控制更简单</td></tr>
+  <tr><td>✗ θ 更大 → T 更小 → 需要更高 V₀ 补偿</td><td>✗ 加速器长度 ∝ 1/f ↑</td></tr>
+  <tr><td>✗ 腔体谐振 Q 值要求更高</td><td>✗ 频率越低可用频段越拥挤</td></tr>
+</table>
+
+<div class="highlight-box">
+  <strong>工业离子注入机 RF 频率选取：</strong>常用 13.56 MHz（ISM 频段，工业标准）、27.12 MHz、40.68 MHz。频率上限由 T(θ) 的衰减限定：要求 T > 0.85 → θ = 2πfd/v &lt; 1.0 rad → f &lt; v/(2πd)。
+</div>
+
+<p>对于典型参数 d = 30 mm，v ≈ 2×10⁶ m/s（约 100 keV 的 B⁺ 离子速度），f 上限约为：</p>
+
+<div class="formula">
+  f<sub>max</sub> &lt; v / (2πd) = 2×10⁶ / (2π × 0.03) ≈ <span class="hl">10.6 MHz</span>
+  <span class="cmt">若 f 超过 10.6 MHz，T &lt; 0.85，需增加 V₀ 补偿能量损失，导致性价比下降</span>
+</div>
+
+<h2>六、n 个 RF 桶的完整设计方程</h2>
+
+<p>将以上全部耦合关系归纳为一个系统方程：</p>
+
+<div class="formula">
+  <span class="hl">E<sub>total</sub></span> = E₀ + <span class="hl">n</span> · q · V₀ · T(2πfd/v) · cos(φₛ)<br><br>
+  <span class="hl2">约束条件：</span><br>
+  ① V₀/d &lt; E<sub>breakdown</sub> （真空击穿约束）<br>
+  ② η₀<sup>n</sup> ≥ η<sub>min</sub> （束流传输效率下限）<br>
+  ③ -π/2 &lt; φₛ &lt; 0 （纵向聚焦必要条件）<br>
+  ④ I = q · N<sub>bunch</sub> · f ≤ J<sub>CL</sub> · A （空间电荷极限）<br>
+  ⑤ T(θ) ≥ T<sub>min</sub>（通常 ≥ 0.80）
+</div>
+
+<h2>七、实例：设计一台 n=12 的 RF 加速段</h2>
+
+<div class="highlight-box">
+  <strong>设计目标：</strong>将 B⁺ 离子从 E₀ = 40 keV 加速至 E_total = 400 keV。<br>
+  <strong>已知：</strong>真空度 5×10⁻⁸ Torr，d = 35 mm，f = 13.56 MHz。<br>
+  <strong>求解：</strong>V₀、φₛ、预期束流传输效率。
+</div>
+
+<p><strong>Step 1 — 计算离子速度：</strong></p>
+
+<div class="formula">
+  v₀ = √(2E₀/m) = √(2 × 40×10³ eV × 1.6×10⁻¹⁹ / (11×1.67×10⁻²⁷))<br>
+  ≈ √(1.28×10⁻¹⁴ / 1.84×10⁻²⁶) ≈ <span class="hl">8.34×10⁵ m/s</span>
+  <span class="cmt">B⁺ 质量 ≈ 11 amu = 11 × 1.67×10⁻²⁷ kg</span>
+</div>
+
+<p><strong>Step 2 — 渡越角与 T：</strong></p>
+
+<div class="formula">
+  θ = 2πfd / v₀ = 2π × 13.56×10⁶ × 0.035 / 8.34×10⁵<br>
+  = 2.98×10⁶ / 8.34×10⁵ ≈ <span class="hl">3.57 rad</span><br>
+  T = sin(θ/2)/(θ/2) = sin(1.785)/1.785 ≈ 0.977/1.785 ≈ <span class="hl2">0.547</span>
+</div>
+
+<div class="key-point">
+  <strong>T=0.547 不够好。</strong>需要降低 f 或减小 d。若改为 f = 5 MHz：θ ≈ 1.32 rad → T ≈ 0.90 ✓ 可用。
+</div>
+
+<p><strong>Step 3 — 每间隙所需 ΔE：</strong></p>
+
+<div class="formula">
+  ΔE<sub>total</sub> = 400 - 40 = 360 keV<br>
+  ΔE<sub>per gap</sub> = 360 keV / <span class="hl">n</span> = 360 / 12 = <span class="hl">30 keV/gap</span>
+</div>
+
+<p><strong>Step 4 — 反解 V₀：</strong></p>
+
+<div class="formula">
+  V₀ = ΔE<sub>per gap</sub> / (q · T · cos φₛ)<br>
+  取 φₛ = -25° (cosφₛ=0.906)，T=0.90<br>
+  V₀ = 30×10³ / (1 × 0.90 × 0.906) ≈ <span class="hl">36.8 kV</span>
+  <span class="cmt">验证：V₀/d = 36.8×10³ / 0.035 ≈ 1.05 MV/m ≪ 5 MV/m ✓ 非常安全</span>
+</div>
+
+<p><strong>Step 5 — 传输效率预估：</strong></p>
+
+<div class="formula">
+  取 η₀ = 0.98（良好设计的单个间隙效率）<br>
+  η<sub>12</sub> = 0.98<sup>12</sup> ≈ <span class="hl">78.5%</span>
+  <span class="cmt">约 22% 的束流在加速过程中丢失——这 12 段 RF 加速后的有效束流约为源引出束流的 78%</span>
+</div>
+
+<h2>八、总结：一张图理清 RF 加速器设计</h2>
+
+<div class="diagram">
+  <svg viewBox="0 0 720 420" width="100%" height="auto" style="max-width:660px">
+    <rect x="5" y="5" width="710" height="410" rx="6" fill="#fafbfc" stroke="#e0e4e8"/>
+    <text x="360" y="30" text-anchor="middle" font-size="15" fill="#003d7a" font-weight="600">RF 加速器参数设计流程图</text>
+
+    <!-- Input box -->
+    <rect x="260" y="50" width="200" height="36" rx="6" fill="#e8f0fe" stroke="#1a56db" stroke-width="1.5"/>
+    <text x="360" y="73" text-anchor="middle" font-size="13" fill="#1a56db" font-weight="600">目标：E_total, I_beam</text>
+
+    <!-- Arrow down -->
+    <line x1="360" y1="86" x2="360" y2="110" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Choose n -->
+    <rect x="210" y="110" width="300" height="36" rx="6" fill="#fff3cd" stroke="#e6d88a" stroke-width="1.5"/>
+    <text x="360" y="133" text-anchor="middle" font-size="13" fill="#6b5000">选择 n（综合考虑 E/ΔE 与 η₀ⁿ）</text>
+
+    <line x1="360" y1="146" x2="360" y2="170" stroke="#666" stroke-width="1.5"/>
+
+    <!-- Choose f -->
+    <rect x="210" y="170" width="300" height="36" rx="6" fill="#fff3cd" stroke="#e6d88a" stroke-width="1.5"/>
+    <text x="360" y="193" text-anchor="middle" font-size="13" fill="#6b5000">选择 f（13.56 MHz 或更低以保证 T>0.85）</text>
+
+    <line x1="360" y1="206" x2="360" y2="230" stroke="#666" stroke-width="1.5"/>
+
+    <!-- Choose d -->
+    <rect x="210" y="230" width="300" height="36" rx="6" fill="#fff3cd" stroke="#e6d88a" stroke-width="1.5"/>
+    <text x="360" y="253" text-anchor="middle" font-size="13" fill="#6b5000">选择 d（击穿约束：V/d < E_bd）</text>
+
+    <line x1="360" y1="266" x2="360" y2="290" stroke="#666" stroke-width="1.5"/>
+
+    <!-- Compute V₀ -->
+    <rect x="210" y="290" width="300" height="36" rx="6" fill="#fff3cd" stroke="#e6d88a" stroke-width="1.5"/>
+    <text x="360" y="313" text-anchor="middle" font-size="13" fill="#6b5000">计算 V₀（ΔE/gap = qV₀T(θ)cosφₛ）</text>
+
+    <line x1="360" y1="326" x2="360" y2="350" stroke="#666" stroke-width="1.5"/>
+
+    <!-- Verify box -->
+    <rect x="200" y="350" width="320" height="42" rx="6" fill="#e8f5f0" stroke="#27ae60" stroke-width="1.5"/>
+    <text x="360" y="370" text-anchor="middle" font-size="13" fill="#1a5030">验证：V₀/d < 5 MV/m 且 η₀ⁿ ≥ 60%</text>
+    <text x="360" y="386" text-anchor="middle" font-size="11" fill="#27ae60">通过 → 设计完成 | 不通过 → 调整 n/f/d 重算</text>
+  </svg>
+  <div class="diagram-label">▲ 图 6 — RF 加速器参数设计闭环流程</div>
+</div>
+
+<div class="sep">◆ ◆ ◆</div>
+
+<p>射频加速器设计本质上是能量、束流、造价三者之间的多参数优化。四个"旋钮"——V₀、φₛ、d、f——通过渡越时间因子 T(θ) 和同步相位 cos(φₛ) 耦合在一起，而 n 作为宏观自由度决定了加速段的物理长度和成本。理解这些参数之间的耦合关系，是设计高效、稳定的离子注入 RF 加速器的关键。</p>
+
+<div class="highlight-box">
+  <strong>记住三个最重要的公式：</strong><br><br>
+  ① <strong>能量方程：</strong>E_total = E₀ + n · q · V₀ · T(2πfd/v) · cos(φₛ)<br>
+  ② <strong>束流极限：</strong>I_max = (4ε₀/9) · √(2q/m) · V^(3/2) · A/d²<br>
+  ③ <strong>相位稳定：</strong>-π/2 &lt; φₛ &lt; 0（负相位 = 纵向聚焦）
+</div>
+
+<p style="text-align:center;color:#999;font-size:13px;margin-top:40px;">
+  <em>— 芯片工坊 · 设备物理系列 —</em>
+</p>
+
+</div><!-- .content -->
+</div><!-- .article-container -->
+
+</body>
+</html>
