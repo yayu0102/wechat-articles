@@ -698,137 +698,53 @@ body {
 
 <script>
 const ARTICLE_DATA = [
-  {title:"缺陷检测：AI 在半导体里最成熟的应用", url:"https://mp.weixin.qq.com/s/bIXWZ3ArVBmtZCokrNRFCQ", date:"2026-07-21", tags:"AI,半导体制造,量测", summary:"ADC自动缺陷分类从人工85%到AI 98.5%——CNN/ViT/VLM三代入场,imec DDPM合成缺陷数据,KLA/AMAT/日立产品布局"},
-  {title:"一文看懂第三代半导体：碳化硅和氮化镓产业链，谁在真正赚钱", url:"https://mp.weixin.qq.com/s/7oKbJWo0OiBaaTBsIorY3w", date:"2026-07-26", tags:"SiC,GaN,产业分析", summary:"SiC衬底全行业亏损(Wolfspeed破产/天岳净亏),外延夹缝求生,器件ST/英飞凌吃肉毛利率40-50%。GaN-on-Si成本是SiC的1/10,CAGR 42%"},
-  {title:"PVD溅射靶材寿命预测：AI看穿那块银色砖头", url:"https://mp.weixin.qq.com/s/gSD7IhouDoidiFmF8paRbg", date:"2026-07-24", tags:"AI,设备,半导体制造", summary:"racetrack groove侵蚀→膜厚均匀性崩溃,KWH计数器的三个盲区,GPR+LSTM贝叶斯优化预测剩余寿命,PINN物理-数据融合"},
-  {title:"一片晶圆为什么会废掉", url:"https://mp.weixin.qq.com/s/Zgk28KKvIbzHLoacIaVa5Q", date:"2026-07-20", tags:"半导体制造,工艺整合,新手", summary:"从颗粒污染到光刻对准偏移,从刻蚀过冲到CMP划伤——一片晶圆从进入fab到报废的所有可能路径,以及每个环节的良率损失分布"},
-  {title:"半导体产线上，AI 到底在忙什么？一张全景地图讲清楚", url:"https://mp.weixin.qq.com/s/sZDiT-bxb6KPXgUZEprmrg", date:"2026-07-19", tags:"AI,半导体制造,趋势", summary:"fab全流程AI应用地图:缺陷检测→虚拟量测→预测性维护→工艺参数优化→良率管理。从数据采集到决策闭环,每一层AI在做什么"},
-  {title:"AI 到底是什么？三句话讲清楚", url:"https://mp.weixin.qq.com/s/3lwcMpdd_f_LJP_0mjqUcw", date:"2026-07-18", tags:"AI,新手", summary:"零基础AI科普——神经网络=多层函数叠加、训练=不断调参数让输出逼近答案、GPT=根据上文预测下一个词。不打鸡血,三句话讲透本质"},
-  {title:"芯片制造里的隐形画笔：离子注入机扫描电源到底在干什么？", url:"https://mp.weixin.qq.com/s/KimRGBmHhmG1NDNfX9A8BQ", date:"2026-07-17", tags:"离子注入,设备,干货", summary:"扫描电源的波形/频率/幅度如何控制束斑覆盖整片晶圆,静电扫描vs磁场扫描,X/Y双向扫描+机械扫描的三级协同,剂量均匀性的工程实现"},
-  {title:"精密温控：差一度都不行——PID、斜率和坩埚控温，一次讲透", url:"https://mp.weixin.qq.com/s/hYdPtUxpIsJ2EJAwJ-XDBw", date:"2026-07-16", tags:"设备,干货,热处理", summary:"PID控制原理,Kp/Ki/Kd直观解释,半导体设备的温度斜坡控制策略,坩埚热场设计与控温均匀性的工程权衡"},
-  {title:"电机的两只眼睛：一次编码与二次编码，一次讲透", url:"https://mp.weixin.qq.com/s/Q-ov0VAnved_laG4Adk1dw", date:"2026-07-15", tags:"自动化,设备,干货", summary:"增量式vs绝对式编码器,分辨率/精度/重复定位的概念辨析,一次编码(电机端)与二次编码(负载端)的闭环架构,半导体设备中的全闭环控制"},
-  {title:"离子注入机里的电子秤——法拉第杯工作原理全解", url:"https://mp.weixin.qq.com/s/02_HcnC3q4kUjIjsQN-Fxw", date:"2026-07-14", tags:"离子注入,设备,干货", summary:"法拉第杯的物理原理——电荷收集→电流积分→剂量计算,二次电子抑制,杯型设计对精度的影响,注入机中三种法拉第杯(Inject/FEM/ERS)的布局逻辑"},
-  {title:"磁场与透镜的四重奏——离子注入束线如何驯服一束离子", url:"https://mp.weixin.qq.com/s/LBsBQqTCJvmxlef_patgPg", date:"2026-07-13", tags:"离子注入,设备,器件物理", summary:"分析磁铁(质量筛选)+四极透镜(聚焦)+能量磁铁(能量筛选)+扫描磁铁(均匀覆盖)——四种磁场元件是如何接力驯服一束离子的"},
-  {title:"分子泵：让真空不再是空", url:"https://mp.weixin.qq.com/s/WupSQVPHR0z1Pu__WSt_qg", date:"2026-07-12", tags:"真空,设备,干货", summary:"涡轮分子泵的动叶轮/静叶轮交替压缩原理,抽速曲线解读,前级压力匹配,半导体设备中分子泵的典型配置和常见故障"},
-  {title:"射频加速原理深度解析", url:"https://mp.weixin.qq.com/s/4S76Ly-ZJK_IYC59cA-RFQ", date:"2026-07-11", tags:"离子注入,射频,设备", summary:"RF Linac加速原理——交变电场相位聚焦,渡越时间因子T(θ),n桶串联总能量公式,Child-Langmuir空间电荷极限,四个旋钮(V₀/φₛ/d/f)的设计权衡"},
-  {title:"半导体设备的真空感官：皮拉尼规与电离规是怎么配合的？", url:"https://mp.weixin.qq.com/s/LDuqotp1DowNmp0RTzsMQw", date:"2026-07-21", tags:"真空,设备,干货", summary:"皮拉尼规测低真空、电离规测高真空——两种原理如何覆盖从大气压到10⁻⁹Torr的9个量级，半导体设备为什么需要双规搭配"},
-  {title:"一颗芯片的体检报告：半导体缺陷从哪来，到哪去？", url:"https://mp.weixin.qq.com/s/u7nwHHJt7t9Ceax5bd2tAA", date:"2026-07-22", tags:"半导体制造,工艺整合,量测", summary:"从颗粒/划痕/桥接/断线到缺陷检测全流程——光学检测vs电子束检测、明场vs暗场、KLA/AMAT/日立的产品矩阵"},
-  {title:"碳化硅注入为什么这么特殊：高温Platen的来龙去脉", url:"https://mp.weixin.qq.com/s/VZ4_22E4YbLoBh3YdQY2OA", date:"2026-07-18", tags:"离子注入,SiC,设备", summary:"SiC晶格比硅硬5倍——常温注入产生非晶化无法退火修复。高温注入(500-1000°C)让晶格自愈，但Platen设计面对热膨胀/真空/颗粒三重矛盾"},
-  {title:"半导体刻蚀：把图形刻进芯片——设备结构与原理", url:"https://mp.weixin.qq.com/s/GEnzXCIy9xuImOzJQLgWrg", date:"2026-07-20", tags:"半导体制造,设备,工艺", summary:"从RIE到ICP到ALE——等离子体刻蚀的设备架构、RF偏压控制、终点检测、以及为什么深宽比能做到50:1"},
-  {title:"为什么晶圆要歪着打：揭秘离子注入的7度玄机", url:"https://mp.weixin.qq.com/s/WrNEXU-N9JVV_2XicFQlYQ", date:"2026-07-16", tags:"离子注入,器件物理,工艺", summary:"离子注入不能垂直入射——7度倾斜角是为了避开晶格沟道效应。拆解沟道效应的物理机制、剂量深度分布偏差和如何用倾斜角+氧化层双保险"},
-  {title:"注入之后：RTP 如何让掺杂真正生效", url:"https://mp.weixin.qq.com/s/JlgCqB0hVunwItpsrypGCQ", date:"2026-07-17", tags:"离子注入,热处理,工艺", summary:"离子注入把晶格轰得稀烂——RTP(快速热退火)1000°C/s升降温修复晶格+激活掺杂原子。为什么尖峰退火只在峰值停留<1秒"},
-  {title:"给离子束拍一张热力图：法拉第杯阵列如何用AI一眼看穿剂量异常", url:"https://mp.weixin.qq.com/s/Pv7CZgFTviFZhTtABgSOAw", date:"2026-07-20", tags:"离子注入,AI,设备", summary:"法拉第杯阵列+AI热力图——如何从束斑二维剂量分布中实时识别异常，比单点剂量监控快一个数量级"},
-  {title:"光伏电池和半导体芯片：同硅不同命", url:"https://mp.weixin.qq.com/s/m_iVh025en5PERhjN8oG6A", date:"2026-07-19", tags:"半导体制造,工艺整合,新手", summary:"同样是硅片，光伏用多晶硅纯度99.9999%，芯片要99.9999999%——从原料到工艺到洁净度，拆解光伏和半导体差了哪几步"},
-  {title:"CMP化学机械抛光：晶圆是怎么被\"磨\"平的", url:"https://mp.weixin.qq.com/s/emLccz97IsBSPUiuGAPaUw", date:"2026-07-24", tags:"半导体制造,工艺,材料", summary:"Preston方程MRR=Kp×P×V到纳米级平坦化——化学腐蚀软化+机械磨削协同，三种接触模式走钢丝，CeO₂自停止效应，修整器最被低估的角色"},
-  {title:"MFC：fab 里最容易被冤枉的零件", url:"https://mp.weixin.qq.com/s/puzQlMwP8Za1cH36u87fZw", date:"2026-07-23", tags:"半导体制造,设备,真空", summary:"热式质量流量计+闭环控制阀——拆解MFC内部结构、零点漂移检测、以及为什么0.2sccm的偏差就能让整批wafer报废"},
-  {title:"光刻胶：光刻机里最不起眼的材料，卡住了全世界", url:"https://mp.weixin.qq.com/s/R6WChgUuamXaWAee1VH14A", date:"2026-07-22", tags:"光刻,材料,先进工艺", summary:"光刻胶的化学放大机制、分辨率与灵敏度权衡、EUV光刻胶的量子随机效应——为什么光刻胶是比光刻机更难突破的瓶颈"},
-  {title:"刻蚀为什么这么难：负载效应、选择比和侧壁的暗战", url:"https://mp.weixin.qq.com/s/61fDhhDYvNGhQefIRdwPOQ", date:"2026-07-21", tags:"半导体制造,工艺,设备", summary:"干法刻蚀的三重矛盾——负载效应让密集区和稀疏区刻蚀速率不同、选择比在氧化层和氮化硅之间走钢丝、侧壁垂直度决定晶体管性能"},
-  {title:"一颗芯片的诞生：从沙子到封装", url:"https://mp.weixin.qq.com/s/O_bhYOjK99AJN_7iv-DQGg", date:"2026-07-24", tags:"半导体制造,工艺整合,新手", summary:"石英砂→单晶硅棒→前道制造五步循环(光刻/刻蚀/沉积/CMP/掺杂)→晶圆测试→打线/倒装/先进封装→终测→价值实现。从$0.001到$1000的200倍增值阶梯"},
-  {title:"高规控制器：Inficon BAG402 引脚定义、工作原理与防护指南", url:"https://mp.weixin.qq.com/s/CHV54WZHb9-XIxWTOTnIEg", date:"2026-07-25", tags:"真空,设备,干货", summary:"Inficon BAG402高规控制器的引脚定义、Bayard-Alpert原理、与PLC/AI模块接线方案、以及半导体设备真空测量中的常见故障排查"},
-  {title:"AI 自动调束：离子注入机从\"老师傅手艺\"到\"算法驱动\"的进化", url:"https://mp.weixin.qq.com/s/z-hcXGo-vr9Y1ZM26HQDCQ", date:"2026-07-17", tags:"离子注入,AI,设备", summary:"贝叶斯优化+三点采样黄金分割搜索，20-40维参数空间自动寻优——AI如何把调束从'靠经验赌'变成工程闭环"},
-  {
-    title: "射频加速：能量、束流与 n 级 RF 桶参数协同设计——离子注入机核心加速物理全解析",
-    url: "rf-acceleration.html",
-    date: "2026-07-08",
-    tags: "离子注入,设备,射频",
-    summary: "从渡越时间因子T(θ)到n级串联总能量E=nqV₀Tcos(φₛ)，从Child-Langmuir空间电荷极限到η₀ⁿ传输效率——四个旋钮(V₀,φₛ,d,f)的物理耦合与工程设计方法"
-  },
-  {
-    title: "冷泵（Cryopump）工作原理及其再生过程的技术解析",
-    url: "https://mp.weixin.qq.com/s/Wjpfl5yVx2I7J6T46UEB-A",
-    date: "2026-07-07",
-    tags: "真空,设备,干货",
-    summary: "从G-M制冷机低温冷凝到活性炭吸附——拆解冷泵的抽气机理、再生循环时序、以及如何在PVD/注入机等半导体设备中获得<1e-7 Torr的高真空环境"
-  },
-  {
-    title: "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的「画画」？",
-    url: "https://mp.weixin.qq.com/s/zIDWeQzqejEjIZM_3uCwjg",
-    date: "2026-07-02",
-    tags: "光刻,工艺整合,先进工艺",
-    summary: "瑞利判据到化学放大光刻胶，再到2.1nm套刻精度——拆解光刻为什么占制造成本30%以上"
-  },
-  {
-    title: "半导体制造到底有多少道工序？一张全景图讲透",
-    url: "https://mp.weixin.qq.com/s/SOzYBLM22ioSSk3u09YEMw",
-    date: "2026-07-01",
-    tags: "工艺整合,新手,趋势",
-    summary: "从硅片进来到芯片出去——扩散、光刻、刻蚀、薄膜、CMP、注入、测试，一张全景地图帮你建立整体认知"
-  },
-  {
-    title: "离子注入机里的'磁场'和'空间电荷'，到底是什么关系？",
-    url: "https://mp.weixin.qq.com/s/936azvG2jnRMT9LWyPX39Q",
-    date: "2026-06-30",
-    tags: "离子注入,器件物理,设备",
-    summary: "分析磁镜效应、空间电荷中和、束流膨胀——理解注入机束线设计最核心的两组物理概念"
-  },
-  {
-    title: "离子注入机的'心脏'：离子源都有哪几种？",
-    url: "https://mp.weixin.qq.com/s/ePrkwyxVipGjonR2djqnTQ",
-    date: "2026-06-30",
-    tags: "离子注入,设备,干货",
-    summary: "Freeman源、Bernas源、RF源、ECR源——从热灯丝到等离子体，拆解离子源的演进与选型"
-  },
-  {
-    title: "射频加速：离子注入机的'心脏'怎么跳（一）",
-    url: "https://mp.weixin.qq.com/s/eQQ9_Ll9wpEMn_Yg_mGuXw",
-    date: "2026-06-29",
-    tags: "离子注入,设备,射频",
-    summary: "RF Linac的核心原理——交变电场如何把离子从几十keV加速到MeV量级，逐级拆解"
-  },
-  {
-    title: "射频加速：离子注入机的'心脏'怎么跳（二）",
-    url: "https://mp.weixin.qq.com/s/rWFHCl3LYd3D9zuE3J3-Hg",
-    date: "2026-06-29",
-    tags: "离子注入,设备,射频",
-    summary: "腔体谐振、Q值、相位聚焦——RF加速腔设计中最容易踩的坑和最优设计选择"
-  },
-  {
-    title: "射频加速：射频电源与匹配网络（三）",
-    url: "https://mp.weixin.qq.com/s/Grsn8w87Lvc_Rg4g0yUh1w",
-    date: "2026-06-28",
-    tags: "离子注入,设备,射频",
-    summary: "阻抗匹配网络设计、反射功率控制、自动匹配器的工程实践——RF电源稳定性决定束流质量"
-  },
-  {
-    title: "Copley CME 驱动器配置软件实操指南",
-    url: "https://mp.weixin.qq.com/s/RtBfreyEoOXOztn48DIDLQ",
-    date: "2026-06-28",
-    tags: "自动化,设备,干货",
-    summary: "从硬件接线到参数配置再到PID调参——Copley CME 驱动器上手的完整步骤和常见坑点"
-  },
-  {
-    title: "霍尔信号与电机找相",
-    url: "https://mp.weixin.qq.com/s/ET8R3q3_e6g5t9X1Xjku4g",
-    date: "2026-06-27",
-    tags: "自动化,设备,器件物理",
-    summary: "Hall传感器输出解读、UVW六步换向、自动找相算法——直线电机驱动器调试的核心技能"
-  },
-  {
-    title: "静电吸盘 E-Chuck：晶圆是怎么被「吸」住的",
-    url: "https://mp.weixin.qq.com/s/Y2R-Gh9MaVWLetZbBeTNRg",
-    date: "2026-06-27",
-    tags: "设备,工艺整合,先进工艺",
-    summary: "J-R型 vs Coulomb型静电吸盘的物理机制、漏电流控制、dechuck优化——晶圆夹持的工程内核"
-  },
-  {
-    title: "注入工艺实战：能量、剂量、退火、沟道效应与验证四板斧",
-    url: "https://mp.weixin.qq.com/s/xTDKMNe8wP4gdveb59eOUw",
-    date: "2026-06-26",
-    tags: "离子注入,热处理,干货",
-    summary: "能量选择、剂量校准、RTP退火窗口、沟道效应规避——从工艺工程师的角度拆解注入调试全流程"
-  },
-  {
-    title: "直线电机的'骨架'与'眼睛'：光栅尺和霍尔驱动器如何精准配合？",
-    url: "https://mp.weixin.qq.com/s/dLYxGpv_JRsLK-Sj9tJzuw",
-    date: "2026-06-25",
-    tags: "自动化,设备,量测",
-    summary: "光栅尺反馈与Hall换向的协同控制——直线电机定位精度的完整拆解"
-  }
+  {"title": "一文看懂第三代半导体：碳化硅和氮化镓产业链，谁在真正赚钱", "url": "https://mp.weixin.qq.com/s/7oKbJWo0OiBaaTBsIorY3w", "date": "2026-07-26", "tags": "SiC,GaN,产业分析", "summary": "SiC衬底全行业亏损(Wolfspeed破产/天岳净亏),外延夹缝求生,器件ST/英飞凌吃肉毛利率40-50%。GaN-on-Si成本是SiC的1/10,CAGR 42%"},
+  {"title": "高规控制器：Inficon BAG402 引脚定义、工作原理与防护指南", "url": "https://mp.weixin.qq.com/s/CHV54WZHb9-XIxWTOTnIEg", "date": "2026-07-25", "tags": "真空,设备,干货", "summary": "Inficon BAG402高规控制器的引脚定义、Bayard-Alpert原理、与PLC/AI模块接线方案、以及半导体设备真空测量中的常见故障排查"},
+  {"title": "PVD溅射靶材寿命预测：AI看穿那块银色砖头", "url": "https://mp.weixin.qq.com/s/gSD7IhouDoidiFmF8paRbg", "date": "2026-07-24", "tags": "AI,设备,半导体制造", "summary": "racetrack groove侵蚀→膜厚均匀性崩溃,KWH计数器的三个盲区,GPR+LSTM贝叶斯优化预测剩余寿命,PINN物理-数据融合"},
+  {"title": "CMP化学机械抛光：晶圆是怎么被\"磨\"平的", "url": "https://mp.weixin.qq.com/s/emLccz97IsBSPUiuGAPaUw", "date": "2026-07-24", "tags": "半导体制造,工艺,材料", "summary": "Preston方程MRR=Kp×P×V到纳米级平坦化——化学腐蚀软化+机械磨削协同，三种接触模式走钢丝，CeO₂自停止效应，修整器最被低估的角色"},
+  {"title": "一颗芯片的诞生：从沙子到封装", "url": "https://mp.weixin.qq.com/s/O_bhYOjK99AJN_7iv-DQGg", "date": "2026-07-24", "tags": "半导体制造,工艺整合,新手", "summary": "石英砂→单晶硅棒→前道制造五步循环(光刻/刻蚀/沉积/CMP/掺杂)→晶圆测试→打线/倒装/先进封装→终测→价值实现。从$0.001到$1000的200倍增值阶梯"},
+  {"title": "MFC：fab 里最容易被冤枉的零件", "url": "https://mp.weixin.qq.com/s/puzQlMwP8Za1cH36u87fZw", "date": "2026-07-23", "tags": "半导体制造,设备,真空", "summary": "热式质量流量计+闭环控制阀——拆解MFC内部结构、零点漂移检测、以及为什么0.2sccm的偏差就能让整批wafer报废"},
+  {"title": "一颗芯片的体检报告：半导体缺陷从哪来，到哪去？", "url": "https://mp.weixin.qq.com/s/u7nwHHJt7t9Ceax5bd2tAA", "date": "2026-07-22", "tags": "半导体制造,工艺整合,量测", "summary": "从颗粒/划痕/桥接/断线到缺陷检测全流程——光学检测vs电子束检测、明场vs暗场、KLA/AMAT/日立的产品矩阵"},
+  {"title": "光刻胶：光刻机里最不起眼的材料，卡住了全世界", "url": "https://mp.weixin.qq.com/s/R6WChgUuamXaWAee1VH14A", "date": "2026-07-22", "tags": "光刻,材料,先进工艺", "summary": "光刻胶的化学放大机制、分辨率与灵敏度权衡、EUV光刻胶的量子随机效应——为什么光刻胶是比光刻机更难突破的瓶颈"},
+  {"title": "缺陷检测：AI 在半导体里最成熟的应用", "url": "https://mp.weixin.qq.com/s/bIXWZ3ArVBmtZCokrNRFCQ", "date": "2026-07-21", "tags": "AI,半导体制造,量测", "summary": "ADC自动缺陷分类从人工85%到AI 98.5%——CNN/ViT/VLM三代入场,imec DDPM合成缺陷数据,KLA/AMAT/日立产品布局"},
+  {"title": "半导体设备的真空感官：皮拉尼规与电离规是怎么配合的？", "url": "https://mp.weixin.qq.com/s/LDuqotp1DowNmp0RTzsMQw", "date": "2026-07-21", "tags": "真空,设备,干货", "summary": "皮拉尼规测低真空、电离规测高真空——两种原理如何覆盖从大气压到10⁻⁹Torr的9个量级，半导体设备为什么需要双规搭配"},
+  {"title": "刻蚀为什么这么难：负载效应、选择比和侧壁的暗战", "url": "https://mp.weixin.qq.com/s/61fDhhDYvNGhQefIRdwPOQ", "date": "2026-07-21", "tags": "半导体制造,工艺,设备", "summary": "干法刻蚀的三重矛盾——负载效应让密集区和稀疏区刻蚀速率不同、选择比在氧化层和氮化硅之间走钢丝、侧壁垂直度决定晶体管性能"},
+  {"title": "一片晶圆为什么会废掉", "url": "https://mp.weixin.qq.com/s/Zgk28KKvIbzHLoacIaVa5Q", "date": "2026-07-20", "tags": "半导体制造,工艺整合,新手", "summary": "从颗粒污染到光刻对准偏移,从刻蚀过冲到CMP划伤——一片晶圆从进入fab到报废的所有可能路径,以及每个环节的良率损失分布"},
+  {"title": "半导体刻蚀：把图形刻进芯片——设备结构与原理", "url": "https://mp.weixin.qq.com/s/GEnzXCIy9xuImOzJQLgWrg", "date": "2026-07-20", "tags": "半导体制造,设备,工艺", "summary": "从RIE到ICP到ALE——等离子体刻蚀的设备架构、RF偏压控制、终点检测、以及为什么深宽比能做到50:1"},
+  {"title": "给离子束拍一张热力图：法拉第杯阵列如何用AI一眼看穿剂量异常", "url": "https://mp.weixin.qq.com/s/Pv7CZgFTviFZhTtABgSOAw", "date": "2026-07-20", "tags": "离子注入,AI,设备", "summary": "法拉第杯阵列+AI热力图——如何从束斑二维剂量分布中实时识别异常，比单点剂量监控快一个数量级"},
+  {"title": "半导体产线上，AI 到底在忙什么？一张全景地图讲清楚", "url": "https://mp.weixin.qq.com/s/sZDiT-bxb6KPXgUZEprmrg", "date": "2026-07-19", "tags": "AI,半导体制造,趋势", "summary": "fab全流程AI应用地图:缺陷检测→虚拟量测→预测性维护→工艺参数优化→良率管理。从数据采集到决策闭环,每一层AI在做什么"},
+  {"title": "光伏电池和半导体芯片：同硅不同命", "url": "https://mp.weixin.qq.com/s/m_iVh025en5PERhjN8oG6A", "date": "2026-07-19", "tags": "半导体制造,工艺整合,新手", "summary": "同样是硅片，光伏用多晶硅纯度99.9999%，芯片要99.9999999%——从原料到工艺到洁净度，拆解光伏和半导体差了哪几步"},
+  {"title": "AI 到底是什么？三句话讲清楚", "url": "https://mp.weixin.qq.com/s/3lwcMpdd_f_LJP_0mjqUcw", "date": "2026-07-18", "tags": "AI,新手", "summary": "零基础AI科普——神经网络=多层函数叠加、训练=不断调参数让输出逼近答案、GPT=根据上文预测下一个词。不打鸡血,三句话讲透本质"},
+  {"title": "碳化硅注入为什么这么特殊：高温Platen的来龙去脉", "url": "https://mp.weixin.qq.com/s/VZ4_22E4YbLoBh3YdQY2OA", "date": "2026-07-18", "tags": "离子注入,SiC,设备", "summary": "SiC晶格比硅硬5倍——常温注入产生非晶化无法退火修复。高温注入(500-1000°C)让晶格自愈，但Platen设计面对热膨胀/真空/颗粒三重矛盾"},
+  {"title": "芯片制造里的隐形画笔：离子注入机扫描电源到底在干什么？", "url": "https://mp.weixin.qq.com/s/KimRGBmHhmG1NDNfX9A8BQ", "date": "2026-07-17", "tags": "离子注入,设备,干货", "summary": "扫描电源的波形/频率/幅度如何控制束斑覆盖整片晶圆,静电扫描vs磁场扫描,X/Y双向扫描+机械扫描的三级协同,剂量均匀性的工程实现"},
+  {"title": "注入之后：RTP 如何让掺杂真正生效", "url": "https://mp.weixin.qq.com/s/JlgCqB0hVunwItpsrypGCQ", "date": "2026-07-17", "tags": "离子注入,热处理,工艺", "summary": "离子注入把晶格轰得稀烂——RTP(快速热退火)1000°C/s升降温修复晶格+激活掺杂原子。为什么尖峰退火只在峰值停留<1秒"},
+  {"title": "AI 自动调束：离子注入机从\"老师傅手艺\"到\"算法驱动\"的进化", "url": "https://mp.weixin.qq.com/s/z-hcXGo-vr9Y1ZM26HQDCQ", "date": "2026-07-17", "tags": "离子注入,AI,设备", "summary": "贝叶斯优化+三点采样黄金分割搜索，20-40维参数空间自动寻优——AI如何把调束从'靠经验赌'变成工程闭环"},
+  {"title": "精密温控：差一度都不行——PID、斜率和坩埚控温，一次讲透", "url": "https://mp.weixin.qq.com/s/hYdPtUxpIsJ2EJAwJ-XDBw", "date": "2026-07-16", "tags": "设备,干货,热处理", "summary": "PID控制原理,Kp/Ki/Kd直观解释,半导体设备的温度斜坡控制策略,坩埚热场设计与控温均匀性的工程权衡"},
+  {"title": "为什么晶圆要歪着打：揭秘离子注入的7度玄机", "url": "https://mp.weixin.qq.com/s/WrNEXU-N9JVV_2XicFQlYQ", "date": "2026-07-16", "tags": "离子注入,器件物理,工艺", "summary": "离子注入不能垂直入射——7度倾斜角是为了避开晶格沟道效应。拆解沟道效应的物理机制、剂量深度分布偏差和如何用倾斜角+氧化层双保险"},
+  {"title": "电机的两只眼睛：一次编码与二次编码，一次讲透", "url": "https://mp.weixin.qq.com/s/Q-ov0VAnved_laG4Adk1dw", "date": "2026-07-15", "tags": "自动化,设备,干货", "summary": "增量式vs绝对式编码器,分辨率/精度/重复定位的概念辨析,一次编码(电机端)与二次编码(负载端)的闭环架构,半导体设备中的全闭环控制"},
+  {"title": "离子注入机里的电子秤——法拉第杯工作原理全解", "url": "https://mp.weixin.qq.com/s/02_HcnC3q4kUjIjsQN-Fxw", "date": "2026-07-14", "tags": "离子注入,设备,干货", "summary": "法拉第杯的物理原理——电荷收集→电流积分→剂量计算,二次电子抑制,杯型设计对精度的影响,注入机中三种法拉第杯(Inject/FEM/ERS)的布局逻辑"},
+  {"title": "磁场与透镜的四重奏——离子注入束线如何驯服一束离子", "url": "https://mp.weixin.qq.com/s/LBsBQqTCJvmxlef_patgPg", "date": "2026-07-13", "tags": "离子注入,设备,器件物理", "summary": "分析磁铁(质量筛选)+四极透镜(聚焦)+能量磁铁(能量筛选)+扫描磁铁(均匀覆盖)——四种磁场元件是如何接力驯服一束离子的"},
+  {"title": "分子泵：让真空不再是空", "url": "https://mp.weixin.qq.com/s/WupSQVPHR0z1Pu__WSt_qg", "date": "2026-07-12", "tags": "真空,设备,干货", "summary": "涡轮分子泵的动叶轮/静叶轮交替压缩原理,抽速曲线解读,前级压力匹配,半导体设备中分子泵的典型配置和常见故障"},
+  {"title": "射频加速原理深度解析", "url": "https://mp.weixin.qq.com/s/4S76Ly-ZJK_IYC59cA-RFQ", "date": "2026-07-11", "tags": "离子注入,射频,设备", "summary": "RF Linac加速原理——交变电场相位聚焦,渡越时间因子T(θ),n桶串联总能量公式,Child-Langmuir空间电荷极限,四个旋钮(V₀/φₛ/d/f)的设计权衡"},
+  {"title": "射频加速：能量、束流与 n 级 RF 桶参数协同设计——离子注入机核心加速物理全解析", "url": "rf-acceleration.html", "date": "2026-07-08", "tags": "离子注入,设备,射频", "summary": "从渡越时间因子T(θ)到n级串联总能量E=nqV₀Tcos(φₛ)，从Child-Langmuir空间电荷极限到η₀ⁿ传输效率——四个旋钮(V₀,φₛ,d,f)的物理耦合与工程设计方法"},
+  {"title": "冷泵（Cryopump）工作原理及其再生过程的技术解析", "url": "https://mp.weixin.qq.com/s/Wjpfl5yVx2I7J6T46UEB-A", "date": "2026-07-07", "tags": "真空,设备,干货", "summary": "从G-M制冷机低温冷凝到活性炭吸附——拆解冷泵的抽气机理、再生循环时序、以及如何在PVD/注入机等半导体设备中获得<1e-7 Torr的高真空环境"},
+  {"title": "光刻之魂：曝光、显影和套刻精度——为什么说光刻是半导体最贵的「画画」？", "url": "https://mp.weixin.qq.com/s/zIDWeQzqejEjIZM_3uCwjg", "date": "2026-07-02", "tags": "光刻,工艺整合,先进工艺", "summary": "瑞利判据到化学放大光刻胶，再到2.1nm套刻精度——拆解光刻为什么占制造成本30%以上"},
+  {"title": "半导体制造到底有多少道工序？一张全景图讲透", "url": "https://mp.weixin.qq.com/s/SOzYBLM22ioSSk3u09YEMw", "date": "2026-07-01", "tags": "工艺整合,新手,趋势", "summary": "从硅片进来到芯片出去——扩散、光刻、刻蚀、薄膜、CMP、注入、测试，一张全景地图帮你建立整体认知"},
+  {"title": "离子注入机里的'磁场'和'空间电荷'，到底是什么关系？", "url": "https://mp.weixin.qq.com/s/936azvG2jnRMT9LWyPX39Q", "date": "2026-06-30", "tags": "离子注入,器件物理,设备", "summary": "分析磁镜效应、空间电荷中和、束流膨胀——理解注入机束线设计最核心的两组物理概念"},
+  {"title": "离子注入机的'心脏'：离子源都有哪几种？", "url": "https://mp.weixin.qq.com/s/ePrkwyxVipGjonR2djqnTQ", "date": "2026-06-30", "tags": "离子注入,设备,干货", "summary": "Freeman源、Bernas源、RF源、ECR源——从热灯丝到等离子体，拆解离子源的演进与选型"},
+  {"title": "射频加速：离子注入机的'心脏'怎么跳（一）", "url": "https://mp.weixin.qq.com/s/eQQ9_Ll9wpEMn_Yg_mGuXw", "date": "2026-06-29", "tags": "离子注入,设备,射频", "summary": "RF Linac的核心原理——交变电场如何把离子从几十keV加速到MeV量级，逐级拆解"},
+  {"title": "射频加速：离子注入机的'心脏'怎么跳（二）", "url": "https://mp.weixin.qq.com/s/rWFHCl3LYd3D9zuE3J3-Hg", "date": "2026-06-29", "tags": "离子注入,设备,射频", "summary": "腔体谐振、Q值、相位聚焦——RF加速腔设计中最容易踩的坑和最优设计选择"},
+  {"title": "射频加速：射频电源与匹配网络（三）", "url": "https://mp.weixin.qq.com/s/Grsn8w87Lvc_Rg4g0yUh1w", "date": "2026-06-28", "tags": "离子注入,设备,射频", "summary": "阻抗匹配网络设计、反射功率控制、自动匹配器的工程实践——RF电源稳定性决定束流质量"},
+  {"title": "Copley CME 驱动器配置软件实操指南", "url": "https://mp.weixin.qq.com/s/RtBfreyEoOXOztn48DIDLQ", "date": "2026-06-28", "tags": "自动化,设备,干货", "summary": "从硬件接线到参数配置再到PID调参——Copley CME 驱动器上手的完整步骤和常见坑点"},
+  {"title": "霍尔信号与电机找相", "url": "https://mp.weixin.qq.com/s/ET8R3q3_e6g5t9X1Xjku4g", "date": "2026-06-27", "tags": "自动化,设备,器件物理", "summary": "Hall传感器输出解读、UVW六步换向、自动找相算法——直线电机驱动器调试的核心技能"},
+  {"title": "静电吸盘 E-Chuck：晶圆是怎么被「吸」住的", "url": "https://mp.weixin.qq.com/s/Y2R-Gh9MaVWLetZbBeTNRg", "date": "2026-06-27", "tags": "设备,工艺整合,先进工艺", "summary": "J-R型 vs Coulomb型静电吸盘的物理机制、漏电流控制、dechuck优化——晶圆夹持的工程内核"},
+  {"title": "注入工艺实战：能量、剂量、退火、沟道效应与验证四板斧", "url": "https://mp.weixin.qq.com/s/xTDKMNe8wP4gdveb59eOUw", "date": "2026-06-26", "tags": "离子注入,热处理,干货", "summary": "能量选择、剂量校准、RTP退火窗口、沟道效应规避——从工艺工程师的角度拆解注入调试全流程"},
+  {"title": "直线电机的'骨架'与'眼睛'：光栅尺和霍尔驱动器如何精准配合？", "url": "https://mp.weixin.qq.com/s/dLYxGpv_JRsLK-Sj9tJzuw", "date": "2026-06-25", "tags": "自动化,设备,量测", "summary": "光栅尺反馈与Hall换向的协同控制——直线电机定位精度的完整拆解"}
 ];
 </script>
 <script>
 (function() {
-  var V='2026072801';
+  var V='2026072802';
   if(!location.search.match(/v=\d+/)){var u=location.href.split('#')[0];var s=u.indexOf('?')>0?'&':'?';location.replace(u+s+'v='+V)}
   var allTags = new Set();
   var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
