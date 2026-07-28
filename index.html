@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="format-detection" content="telephone=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>文章分类 · 芯片工坊</title>
 <!-- Fonts: system-native Chinese & monospace — zero external deps -->
 <style>
@@ -813,6 +815,8 @@ const ARTICLE_DATA = [
 </script>
 <script>
 (function() {
+  var V='2026072801';
+  if(!location.search.match(/v=\d+/)){var u=location.href.split('#')[0];var s=u.indexOf('?')>0?'&':'?';location.replace(u+s+'v='+V)}
   var allTags = new Set();
   var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
