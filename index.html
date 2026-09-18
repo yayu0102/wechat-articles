@@ -402,8 +402,8 @@ body {
 
 /* ── Tags ── */
 .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 2px;
-  max-height: 120px; overflow: hidden; transition: max-height 0.3s ease; position: relative; }
-.tags-wrap.expanded { max-height: 2000px; }
+  max-height: 100px; overflow: hidden; transition: max-height 0.3s ease; position: relative; }
+.tags-wrap.expanded { max-height: 3000px; }
 .tag-toggle {
   display: inline-block; padding: 6px 14px; font-size: 11px;
   color: var(--accent, #00d4ff); cursor: pointer; user-select: none;
@@ -688,8 +688,7 @@ body {
       <input class="search-input" type="text" id="searchInput" placeholder="搜索工艺、设备、材料...">
       <button class="search-clear" id="searchClear" title="清除">×</button>
     </div>
-    <div class="tags-wrap" id="tagsWrap"></div>
-    <div class="stats">
+    <div class="tags-wrap" id="tagsWrap"></div><div class="tag-toggle" id="tagToggle" onclick="toggleTags()">展开全部分类 ▾</div><div class="stats">
       <span id="statsText">共 0 篇文章</span>
       <span id="statsFilter" style="display:none"></span>
     </div>
